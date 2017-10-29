@@ -1,4 +1,6 @@
-
+/*
+ * main.cpp
+ */
 
 #include <SDL2/SDL.h>
 #include <stdint.h>
@@ -7,7 +9,7 @@
 #include <memory>
 
 #include "common.h"
-#include "entity.h"
+#include "ecs.h"
 #include "console.h"
 
 #define SCREEN_WIDTH 1280
@@ -52,6 +54,14 @@ int main(int argc, char *argv[])
     // Initialize random number generator
     seed = time(0);
     rng.seed(seed);
+
+    ecs::EntityManager em;
+    em.create();
+    em.create();
+    em.create();
+    ecs::EntityManager test;
+    test.create();
+    test.create();
 
     bool done = false;
     while(!done) {
