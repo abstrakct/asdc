@@ -88,6 +88,16 @@ void Console::put(u32 cellX, u32 cellY, unsigned char c)
     copyFontToPixels(destRect, width, srcRect, fontImageWidth, 0xFFFFFFFF);
 }
 
+void Console::put(u32 cellX, u32 cellY, unsigned char c, u32 color)
+{
+    u32 x = cellX * fontCharWidth;
+    u32 y = cellY * fontCharHeight;
+    Rectangle srcRect = rectForGlyph(c);
+    Rectangle destRect = { x, y, fontCharWidth, fontCharHeight };
+
+    copyFontToPixels(destRect, width, srcRect, fontImageWidth, color);
+}
+
 void Console::generateRandomPixels()
 {
     for(u32 x = 0; x < width; x++) {
@@ -156,8 +166,8 @@ void Console::copyBlend(Rectangle *destRect, u32 destPixelsPerRow,
 // Again, credits to PT_Console - https://github.com/pdetagyos/RoguelikeTutorial/blob/tutorial-step-01/pt_console.c
 // But modified to work with my implementation
 void Console::copyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
-                        Rectangle srcRect, u32 srcPixelsPerRow,
-                        u32 newColor)
+                               Rectangle srcRect, u32 srcPixelsPerRow,
+                               u32 newColor)
 {
     // If src and dest rects are not the same size ==> bad things
     assert(destRect.w == srcRect.w && destRect.h == srcRect.h);

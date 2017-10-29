@@ -19,6 +19,7 @@ boost::random::mt19937 rng;
 void render_screen(SDL_Renderer *renderer, SDL_Texture *screen, std::shared_ptr<Console> c)
 {
     c->clear();
+    c->put(10, 10, '@', 0x0055AAFF);
 
     SDL_UpdateTexture(screen, NULL, c->getPixels(), SCREEN_WIDTH * sizeof(u32));
     SDL_RenderClear(renderer);
@@ -47,7 +48,6 @@ int main(int argc, char *argv[])
     std::shared_ptr<Console> console = std::make_shared<Console>(SCREEN_WIDTH, SCREEN_HEIGHT);
     console->setFont("res/fonts/terminal16x16.png", 16, 16);
     console->clear();
-    console->put(10, 10, '!');
 
     // Initialize random number generator
     seed = time(0);

@@ -5,6 +5,4 @@
 #pragma once
 #include "common.h"
 
-struct Entity {
-    u64 id;
-};
+u64 id;

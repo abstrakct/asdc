@@ -25,8 +25,8 @@ class Console {
         u32 width, height;
         u32 rows, cols;
 
+        // Separate font to its own class/struct?
         std::string fontFileName;
-        //std::vector<u32> fontImage;
         u32* fontImage;
         u8 fontCharWidth, fontCharHeight;
         u32 fontImageWidth, fontImageHeight;
@@ -45,6 +45,8 @@ class Console {
         void clear();
 
         void put(u32 cellX, u32 cellY, unsigned char c);
+        void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
+
         void copyBlend(Rectangle *destRect, u32 destPixelsPerRow,
              Rectangle *srcRect, u32 srcPixelsPerRow,
              u32 *newColor);
