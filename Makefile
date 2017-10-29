@@ -5,7 +5,7 @@
 
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
-BIN_NAME = asx
+BIN_NAME = asdc
 # Compiler used
 CXX = ccache g++
 # Extension of source files used in the project
@@ -13,16 +13,17 @@ SRC_EXT = cpp
 # Path to the source directory, relative to the makefile
 SRC_PATH = src
 # General compiler flags
-COMPILE_FLAGS = -Wall -Wextra -std=c++14 -Wno-unused-variable -Wno-unused-parameter
+COMPILE_FLAGS = -Wall -Wextra -std=c++14 -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function
 # Additional release-specific flags
 RCOMPILE_FLAGS = -D NDEBUG -O3
 # Additional debug-specific flags
 DCOMPILE_FLAGS = -g -ggdb -D DEBUG_ON -D DEVELOPMENT_MODE
 # Add additional include paths
-INCLUDES = -I $(SRC_PATH)/ -I $(SRC_PATH)/../include
+INCLUDES = -I $(SRC_PATH)/ -I $(SRC_PATH)/../include -I $(SRC_PATH)/../lib
 # General linker settings
 #LINK_FLAGS = -lboost_program_options -lboost_random -lm -ltcodxx -lSDL -lSDL2_mixer `pkg-config --libs libconfig++` -Llib -Wl,-rpath=lib
-LINK_FLAGS = -ljsoncpp -lboost_program_options -lboost_random -lboost_serialization -lm -ltcodxx -Llib -Wl,-rpath=lib `sdl2-config --cflags --libs`
+#LINK_FLAGS = -ljsoncpp -lboost_program_options -lboost_random -lboost_serialization -lm -ltcodxx -Llib -Wl,-rpath=lib `sdl2-config --cflags --libs`
+LINK_FLAGS = -lboost_random -Llib -Wl,-rpath=lib `sdl2-config --cflags --libs`
 # Additional release-specific linker settings
 RLINK_FLAGS = 
 # Additional debug-specific linker settings
