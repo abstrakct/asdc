@@ -11,12 +11,15 @@
 #include "common.h"
 #include "ecs.h"
 #include "console.h"
+#include "components.h"
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
 long seed;
 boost::random::mt19937 rng;
+
+using namespace ecs;
 
 void render_screen(SDL_Renderer *renderer, SDL_Texture *screen, std::shared_ptr<Console> c)
 {
@@ -31,6 +34,7 @@ void render_screen(SDL_Renderer *renderer, SDL_Texture *screen, std::shared_ptr<
 
 int main(int argc, char *argv[])
 {
+    // TODO: SDL error checking
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow("asdc",
@@ -55,14 +59,10 @@ int main(int argc, char *argv[])
     seed = time(0);
     rng.seed(seed);
 
-    ecs::EntityManager em;
-    em.create();
-    em.create();
-    em.create();
-    ecs::EntityManager test;
-    test.create();
-    test.create();
+    Entity *e = createEntity()->assign(HealthComponent{13, 15});
+    HealthComponent *testing = e->component<HealthComponent>();
 
+    // loop
     bool done = false;
     while(!done) {
         SDL_Event event;
