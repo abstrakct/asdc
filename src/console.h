@@ -23,7 +23,6 @@ struct Rectangle {
 class Console {
     private:
         u32 width, height;
-        u32 rows, cols;
 
         // Separate font to its own class/struct?
         std::string fontFileName;
@@ -56,4 +55,7 @@ class Console {
         
 
         void generateRandomPixels();
+
+        bool dirty = true;
+        u32 rows, cols;
 };

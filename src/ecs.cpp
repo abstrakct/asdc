@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 
 #include "ecs.h"
@@ -14,9 +15,12 @@ namespace ecs {
 
 std::unordered_map<u64, Entity> entityStore;
 std::vector<std::unique_ptr<BaseComponentStore>> componentStore;
+std::vector<std::unique_ptr<SubscriptionBase>> pubsubHolder;
+std::vector<std::unique_ptr<BaseSystem>> systemStore;
 
-u64 Entity::entityCounter{1};
-u64 BaseComponent::typeCounter = 1;
+u64 Entity::entityCounter{0};
+u64 BaseComponent::typeCounter = 0;
+u64 BaseMessage::typeCounter = 0;
 
 // Borrowed from RLTK because I really like it :)
 // My understanding: it looks up the entity with a specific ID in entityStore and returns a reference to it.
@@ -42,5 +46,34 @@ Entity* createEntity()
     return entity(newEntity.id);
 }
 
+void configureAllSystems()
+{
+    for(std::unique_ptr<BaseSystem> &sys : systemStore)
+        sys->configure();
+}
+
+// Actually delete entities and components marked as deleted. Should be called periodically.
+void collectGarbage()
+{
+    std::unordered_set<u64> entitiesToDelete;
+
+    for (auto it = entityStore.begin(); it != entityStore.end(); ++it) {
+        if (it->second.deleted) {
+            for(std::unique_ptr<BaseComponentStore> &store : componentStore) {
+                if (store)
+                    store->eraseByEntityID(it->second.id);
+            }
+            entitiesToDelete.insert(it->second.id);
+        }
+    }
+
+    for (const u64 &id : entitiesToDelete)
+        entityStore.erase(id);
+
+    for (std::unique_ptr<BaseComponentStore> &store : componentStore) {
+        if (store)
+            store->reallyDelete();
+    }
+}
 
 } // namespace ecs

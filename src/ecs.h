@@ -8,12 +8,30 @@
 
 #include <bitset>
 #include <memory>
+#include <unordered_map>
+#include <queue>
+#include <functional>
+#include <mutex>
+
 #include "common.h"
 
 #define MAX_COMPONENTS 128
 
 namespace ecs {
 
+// forward declarations
+class Entity;
+inline void unsetComponentMask(const u64 id, const u64 familyID, bool deleteIfEmpty = false);
+struct SubscriptionMailbox;
+struct SubscriptionBase;
+struct BaseSystem;
+template<typename S, typename ...Args> inline void addSystem(Args && ... args);
+void configureAllSystems();
+
+// externs, consts
+extern std::unordered_map<u64, Entity> entityStore;
+extern std::vector<std::unique_ptr<SubscriptionBase>> pubsubHolder;
+extern std::vector<std::unique_ptr<BaseSystem>> systemStore;
 const u64 invalidEntity = 0;
 
 /*
@@ -21,15 +39,14 @@ const u64 invalidEntity = 0;
  */
 struct BaseComponent {
     static u64 typeCounter;
-    u64 entityId;
+    u64 entityID;
     bool deleted = false;
 };
 
 /*
  * Component class. For handling components.
  */
-template<class C>
-struct Component : public BaseComponent {
+template<class C> struct Component : public BaseComponent {
     Component() {
         data = C{};
         family();
@@ -38,12 +55,12 @@ struct Component : public BaseComponent {
         family();
     }
 
-    u64 familyId;
+    u64 familyID;
     C data;
 
     inline void family() {
-        static u64 familyIdTemp = BaseComponent::typeCounter++;
-        familyId = familyIdTemp;
+        static u64 familyIDTemp = ++BaseComponent::typeCounter;
+        familyID = familyIDTemp;
     }
 };
 
@@ -51,7 +68,7 @@ struct Component : public BaseComponent {
  * Base Component Store. Actual component stores derive from this class.
  */
 struct BaseComponentStore {
-    virtual void eraseByEntityId(const u64 &id) = 0;
+    virtual void eraseByEntityID(const u64 &id) = 0;
     virtual void reallyDelete() = 0;
     virtual u64 size() = 0;
 };
@@ -59,13 +76,19 @@ struct BaseComponentStore {
 /*
  * Component store.
  */
-template<class C>
-struct ComponentStore : public BaseComponentStore {
+template<class C> struct ComponentStore : public BaseComponentStore {
     std::vector<C> components;
 
-    virtual void eraseByEntityId(const u64 &id) override final {
+    virtual void eraseByEntityID(const u64 &id) override final {
+        for(auto &item : components) {
+            item.deleted = true;
+            unsetComponentMask(id, item.familyID);
+        }
     }
     virtual void reallyDelete() override final {
+        components.erase(std::remove_if(components.begin(), components.end(),
+                                        [] (auto x) { return x.deleted; }),
+                                        components.end());
     }
     virtual u64 size() override final { return components.size(); }
 };
@@ -73,7 +96,7 @@ struct ComponentStore : public BaseComponentStore {
 extern std::vector<std::unique_ptr<BaseComponentStore>> componentStore;
 
 /*
- * Entity class
+ * Entity class definition
  */
 class Entity {
     static u64 entityCounter;
@@ -86,7 +109,7 @@ public:
     bool operator == (const Entity& other) const { return id == other.id; }
     bool operator != (const Entity& other) const { return id != other.id; }
 
-    u64 id; // make private? probably not
+    u64 id;
     bool deleted = false;
     std::bitset<MAX_COMPONENTS> componentMask;
 
@@ -95,14 +118,14 @@ public:
     inline Entity* assign(C &&component) {
         if(deleted) throw std::runtime_error("Cannot assign component to a deleted entity!");
         Component<C> temp(component);
-        temp.entityId = id;
-        if(componentStore.size() < temp.familyId+1)
-            componentStore.resize(temp.familyId+1);
-        if(!componentStore[temp.familyId])
-            componentStore[temp.familyId] = std::move(std::make_unique<ComponentStore<Component<C>>>());
+        temp.entityID = id;
+        if(componentStore.size() < temp.familyID+1)
+            componentStore.resize(temp.familyID+1);
+        if(!componentStore[temp.familyID])
+            componentStore[temp.familyID] = std::move(std::make_unique<ComponentStore<Component<C>>>());
 
-        static_cast<ComponentStore<Component<C>> *>(componentStore[temp.familyId].get())->components.push_back(temp);
-        componentMask.set(temp.familyId);
+        static_cast<ComponentStore<Component<C>> *>(componentStore[temp.familyID].get())->components.push_back(temp);
+        componentMask.set(temp.familyID);
         return this;
     }
 
@@ -114,23 +137,18 @@ public:
 
         C emptyComponent;
         Component<C> temp(emptyComponent);
-        if(!componentMask.test(temp.familyId)) return result;
-        for(Component<C> &component : static_cast<ComponentStore<Component<C>> *>(componentStore[temp.familyId].get())->components) {
-            if(component.entityId == id) {
+        if(!componentMask.test(temp.familyID)) return result;
+        for(Component<C> &component : static_cast<ComponentStore<Component<C>> *>(componentStore[temp.familyID].get())->components) {
+            if(component.entityID == id) {
                 result = &component.data;
                 return result;
             }
         }
         return result;
     }
-
-    /*template<class C>
-    inline C * component() {
-        return component<C>(*this);
-    }*/
 };
 
-// Borrowed from RLTK:
+// More stuff borrowed/adapted/adopted from RLTK:
 /*
  * entity(ID) is used to reference an entity. So you can, for example, do:
  * entity(12)->component<position_component>()->x = 3;
@@ -143,5 +161,182 @@ Entity* entity(const u64 id) noexcept;
  */
 Entity* createEntity();
 
+/*
+ * Delete an entity.
+ */
+inline void deleteEntity(const u64 id)
+{
+    auto e = entity(id);
+    if(!e) return;
+    e->deleted = true; // todo: implement garbage collection?!
 
+    for(auto &store : componentStore) {
+        if(store)
+            store->eraseByEntityID(id);
+    }
 }
+
+inline void deleteEntity(Entity &e) noexcept
+{
+    deleteEntity(e.id);
+}
+
+inline void unsetComponentMask(const u64 id, const u64 familyID, bool deleteIfEmpty)
+{
+    auto finder = entityStore.find(id);
+    if(finder != entityStore.end()) {
+        finder->second.componentMask.reset(familyID);
+        if(deleteIfEmpty && finder->second.componentMask.none())
+            finder->second.deleted = true;
+    }
+}
+
+/* 
+ * I wrote this one myself, and it works! I consider it proof that I now understand this architecture pretty well. 
+ * This returns a vector with all Entities that have a component of type C
+ */
+template<class C>
+std::vector<Entity *> findAllEntitiesWithComponent()
+{
+    C empty;
+    Component<C> handle(empty);
+    u64 family = handle.familyID;
+    std::vector<Entity*> result;
+
+    for(auto &it : entityStore) {
+        if(it.second.componentMask[family]) {
+            result.push_back(&it.second);
+        }
+    }
+
+    return result;
+}
+
+/*
+ * Mailboxes and message delivery system - again from RLTK
+ */
+
+struct BaseMessage {
+    static u64 typeCounter;
+};
+
+template <class C> struct Message : public BaseMessage {
+    Message() {
+        C empty;
+        data = empty;
+        family();
+    }
+    Message(C comp) : data(comp) {
+        family();
+    }
+
+    u64 familyID;
+    C data;
+
+    inline void family() {
+        static u64 familyIDTemp = BaseMessage::typeCounter++;
+        familyID = familyIDTemp;
+    }
+};
+
+struct SubscriptionBase {
+    virtual void deliverMessages() = 0;
+};
+
+struct SubscriptionMailbox {
+};
+
+template <class C> struct Mailbox : SubscriptionMailbox {
+    std::queue<C> messages;
+};
+
+template <class C> struct SubscriptionHolder : SubscriptionBase {
+    std::queue<C> deliveryQueue;
+    std::mutex deliveryMutex;
+    std::vector<std::tuple<bool, std::function<void(C& message)>, BaseSystem *>> subscriptions;
+
+    virtual void deliverMessages() override {
+        std::lock_guard<std::mutex> guard(deliveryMutex);
+        while(!deliveryQueue.empty()) {
+            C message = deliveryQueue.front();
+            deliveryQueue.pop();
+            Message<C> handle(message);
+
+            for(auto &func : subscriptions) {
+                if(std::get<0>(func) && std::get<1>(func)) {
+                    std::get<1>(func)(message);
+                } else {
+                    // It is destined for the system's mailbox queue.
+                    auto finder = std::get<2>(func)->mailboxes.find(handle.familyID);
+                    if (finder != std::get<2>(func)->mailboxes.end()) {
+                        static_cast<Mailbox<C> *>(finder->second.get())->messages.push(message);
+                    }
+                }
+            }
+        }
+    }
+};
+
+/*
+ * Systems
+ */
+/*
+ * Base System definition. Systems must inherit from this class.
+ */
+struct BaseSystem {
+    virtual void configure() {}
+    virtual void update(const double durationMS) = 0;
+    std::string systemName = "Unnamed system";
+    std::unordered_map<u64, std::unique_ptr<SubscriptionMailbox>> mailboxes;
+
+    template<class MSG> void subscribe(std::function<void(MSG &message)> destination) {
+        MSG emptyMessage;
+        Message<MSG> handle(emptyMessage);
+        if(pubsubHolder.size() < handle.familyID + 1)
+            pubsubHolder.resize(handle.familyID + 1);
+        if(!pubsubHolder[handle.familyID])
+            pubsubHolder[handle.familyID] = std::move(std::make_unique<SubscriptionHolder<MSG>>());
+
+        static_cast<SubscriptionHolder<MSG> *>(pubsubHolder[handle.familyID].get())->subscriptions.push_back(std::make_tuple(true, destination, nullptr));
+    }
+
+    template<class MSG> void subscribe_mbox() {
+        MSG emptyMessage{};
+        Message<MSG> handle(emptyMessage);
+        if (pubsubHolder.size() < handle.familyID + 1)
+            pubsubHolder.resize(handle.familyID + 1);
+        if (!pubsubHolder[handle.familyID])
+            pubsubHolder[handle.familyID] = std::move(std::make_unique<SubscriptionHolder<MSG>>());
+        std::function<void(MSG &message)> destination;
+        static_cast<SubscriptionHolder<MSG> *>(pubsubHolder[handle.familyID].get())->subscriptions.push_back(std::make_tuple(false, destination, this));
+        mailboxes[handle.familyID] = std::make_unique<Mailbox<MSG>>();
+    }
+};
+
+template<typename S, typename ...Args>
+inline void addSystem(Args && ... args) {
+    systemStore.push_back(std::make_unique<S>(std::forward<Args>(args) ... ));
+}
+
+/*
+ * Submit a message for delivery. It will be delivered to every system that has issued a subscribe or subscribe_mbox call.
+ */
+template <class MSG> inline void emit(MSG message)
+{
+    Message<MSG> handle(message);
+    if(pubsubHolder.size() > handle.familyID) {
+        for(auto &func : static_cast<SubscriptionHolder<MSG> *>(pubsubHolder[handle.familyID].get())->subscriptions) {
+            if (std::get<0>(func) && std::get<1>(func)) {
+                std::get<1>(func)(message);
+            } else {
+                auto finder = std::get<2>(func)->mailboxes.find(handle.familyID);
+                if (finder != std::get<2>(func)->mailboxes.end()) {
+                    static_cast<Mailbox<MSG> *>(finder->second.get())->messages.push(message);
+                }
+            }
+        }
+    }
+}
+
+} // namespace ecs
+// vim: fdm=syntax
