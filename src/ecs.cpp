@@ -46,6 +46,16 @@ Entity* createEntity()
     return entity(newEntity.id);
 }
 
+Entity* createEntity(u64 newID)
+{
+    Entity newEntity(newID);
+    if(entityStore.find(newEntity.id) != entityStore.end()) {
+        throw std::runtime_error("WARNING! Duplicate Entity IDs! This will not end well!");
+    }
+    entityStore.emplace(newEntity.id, newEntity);
+    return entity(newEntity.id);
+}
+
 void configureAllSystems()
 {
     for(std::unique_ptr<BaseSystem> &sys : systemStore)

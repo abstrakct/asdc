@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     rng.seed(seed);
 
     // create some entitites for now
-    ecs::Entity *player      = ecs::createEntity()->assign(Position(25, 20))->assign(Renderable('@', 0x0055AAFF));
+    ecs::Entity *player      = ecs::createEntity(playerID)->assign(Position(25, 20))->assign(Renderable('@', 0x0055AAFF));
     //ecs::Entity *testWall    = makeWall(27, 20);
     //ecs::Entity *testWalltwo = makeWall(37, 25);
     world = std::make_shared<World>(console->rows, console->cols);
@@ -172,6 +172,22 @@ int main(int argc, char *argv[])
                     case SDLK_RIGHT:
                     case SDLK_l:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1,  0 });
+                        console->dirty = true;
+                        break;
+                    case SDLK_y:
+                        ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1, -1 });
+                        console->dirty = true;
+                        break;
+                    case SDLK_u:
+                        ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1, -1 });
+                        console->dirty = true;
+                        break;
+                    case SDLK_b:
+                        ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1,  1 });
+                        console->dirty = true;
+                        break;
+                    case SDLK_n:
+                        ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1,  1 });
                         console->dirty = true;
                         break;
                     default:

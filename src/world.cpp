@@ -12,6 +12,7 @@
 
 ecs::Entity* makeWall(u32 x, u32 y)
 {
+    // TODO: look for already created cell at position?!
     return ecs::createEntity()->assign(Position(x, y))->assign(Renderable(WALL_GLYPH, WALL_COLOR))->assign(MapCell(cellWall))->assign(Physicality(true, true));
 
 }

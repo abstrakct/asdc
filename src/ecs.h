@@ -104,6 +104,10 @@ public:
     Entity() {
         id = ++entityCounter;
     };
+    Entity(u64 newID) {
+        id = newID;
+        entityCounter = newID+1;
+    }
     // TODO: constructor for specific ID
     // Operator overloading
     bool operator == (const Entity& other) const { return id == other.id; }
@@ -160,6 +164,7 @@ Entity* entity(const u64 id) noexcept;
  * call chaining. For example create_entity()->assign(foo)->assign(bar)
  */
 Entity* createEntity();
+Entity* createEntity(u64 newID);
 
 /*
  * Delete an entity.
