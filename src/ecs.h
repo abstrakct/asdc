@@ -27,6 +27,8 @@ struct SubscriptionBase;
 struct BaseSystem;
 template<typename S, typename ...Args> inline void addSystem(Args && ... args);
 void configureAllSystems();
+void tick(const double durationMS);
+void run(std::function<void(double)> on_tick);
 
 // externs, consts
 extern std::unordered_map<u64, Entity> entityStore;
@@ -201,7 +203,7 @@ inline void unsetComponentMask(const u64 id, const u64 familyID, bool deleteIfEm
  * This returns a vector with all Entities that have a component of type C
  */
 template<class C>
-std::vector<Entity *> findAllEntitiesWithComponent()
+inline std::vector<Entity *> findAllEntitiesWithComponent()
 {
     C empty;
     Component<C> handle(empty);

@@ -30,7 +30,7 @@ struct Renderable {
 };
 
 enum MapCellType {
-    cellUnknown = 0,
+    cellUnused = 0,
     cellFloor,
     cellWall
 };
@@ -39,7 +39,7 @@ struct MapCell {
     MapCell() {}
     MapCell(MapCellType t) : type(t) {}
 
-    MapCellType type = cellUnknown;
+    MapCellType type = cellUnused;
 };
 
 struct Physicality {

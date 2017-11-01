@@ -86,4 +86,13 @@ void collectGarbage()
     }
 }
 
+
+void tick(const double durationMS)
+{
+    for (std::unique_ptr<BaseSystem> &sys : systemStore) {
+        sys->update(durationMS);
+    }
+}
+
+
 } // namespace ecs

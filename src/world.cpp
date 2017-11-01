@@ -17,6 +17,36 @@ ecs::Entity* makeWall(u32 x, u32 y)
 
 }
 
+Level::Level(u32 w, u32 h)
+{
+    width = w;
+    height = h;
+    initCache();
+}
+
+Level::~Level()
+{
+    for(u32 i = 0; i < height; i++)
+        delete cache[i];
+
+    delete *cache;
+}
+
+void Level::initCache()
+{
+    cache = new MapCacheCell*[width];
+    for (u32 i = 0; i < width; i++)
+        cache[i] = new MapCacheCell[height];
+
+    for (u32 x = 0; x < width; x++) {
+        for (u32 y = 0; y < height; y++) {
+            cache[x][y].type = cellUnused;
+            cache[x][y].glyph = ' ';
+            cache[x][y].fgColor = 0;
+        }
+    }
+}
+
 void Level::generateFrame()
 {
     for (u32 x = 0; x < width; x++) {
@@ -32,4 +62,11 @@ void Level::generateFrame()
 void World::generate()
 {
     level->generateFrame();
+    for (u32 x = 0; x < level->width; x++) {
+        for (u32 y = 0; y < level->height; y++) {
+            /*if(fiftyfifty()) {
+                level->cells.push_back(makeWall(x, y));
+            }*/
+        }
+    }
 }

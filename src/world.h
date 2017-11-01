@@ -6,18 +6,28 @@
 
 #include <memory>
 #include "ecs.h"
+#include "components.h"
 
 ecs::Entity* makeWall(u32 x, u32 y);
 
+struct MapCacheCell {
+    MapCellType type;
+    unsigned char glyph;
+    u32 fgColor;
+};
+
 class Level {
     private:
+        void initCache();
     public:
         Level() {};
-        Level(u32 w, u32 h) : width(w), height(h) {};
+        Level(u32 w, u32 h);
+        ~Level();
         void generateFrame();
 
         u32 width, height;
         std::vector<ecs::Entity *> cells;
+        MapCacheCell **cache;
 };
 
 class World {
