@@ -8,7 +8,9 @@
 #include "ecs.h"
 #include "components.h"
 
+bool positionBlocksMovement(u32 x, u32 y);
 ecs::Entity* makeWall(u32 x, u32 y);
+ecs::Entity* makeFloor(u32 x, u32 y);
 
 struct MapCacheCell {
     MapCellType type;
@@ -24,6 +26,7 @@ class Level {
         Level(u32 w, u32 h);
         ~Level();
         void generateFrame();
+        void fill(ecs::Entity* (*makerFunction)(u32 x, u32 y));
 
         u32 width, height;
         std::vector<ecs::Entity *> cells;

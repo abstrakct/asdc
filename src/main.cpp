@@ -12,6 +12,8 @@
 #include "ecs.h"
 #include "console.h"
 #include "components.h"
+#include "systems.h"
+#include "messages.h"
 #include "world.h"
 
 #define SCREEN_WIDTH 1280
@@ -30,23 +32,6 @@ boost::random::mt19937 rng;
 const u64 playerID = 1;     // Entity with ID 1 is always the player.
 
 /*
- * Look at all entities in a certain position,
- * return true if any blocks movement.
- */
-bool positionBlocksMovement(u32 x, u32 y)
-{
-    for (auto it : ecs::findAllEntitiesWithComponent<Position>()) {
-        Position *c = it->component<Position>();
-        if(c && c->x == x && c->y == y) {
-            Physicality *p = it->component<Physicality>();
-            if(p->blocksMovement)
-                return true;
-        }
-    }
-    return false;
-}
-
-/*
  * Build a cache for a level map, so that we don't need to iterate through a million entities each render loop.
  * Cache is a 2D array inside the Level class that gets allocated in the constructor.
  */
@@ -63,30 +48,6 @@ void buildMapCache(std::shared_ptr<Level> level)
         }
     }
 }
-
-struct ActorMovedMessage : ecs::BaseMessage {
-    ActorMovedMessage() {}
-    ActorMovedMessage(ecs::Entity* a, i32 x, i32 y) : actor(a), dx(x), dy(y) {}
-    
-    ecs::Entity *actor;
-    i32 dx, dy;
-};
-
-struct ActorMovementSystem : public ecs::BaseSystem {
-    virtual void configure() override {
-        systemName = "Actor Movement System";
-        subscribe<ActorMovedMessage>([](ActorMovedMessage &msg) {
-                u32 newx = msg.actor->component<Position>()->x + msg.dx;
-                u32 newy = msg.actor->component<Position>()->y + msg.dy;
-                if (!positionBlocksMovement(newx, newy)) {
-                    msg.actor->component<Position>()->x = newx;
-                    msg.actor->component<Position>()->y = newy;
-                }
-                });
-    }
-    virtual void update(const double durationMS) override {
-    }
-};
 
 void renderScreen(SDL_Renderer *renderer, SDL_Texture *screen, std::shared_ptr<Console> c)
 {
