@@ -24,3 +24,10 @@ struct ActorMovementSystem : public ecs::BaseSystem {
     }
 };
 
+struct CameraSystem : public ecs::BaseSystem {
+    virtual void configure() override {
+        systemName = "Camera System";
+    }
+
+    virtual void update(const double durationMS) override;
+};

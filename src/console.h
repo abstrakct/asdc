@@ -27,7 +27,6 @@ class Console {
         // Separate font to its own class/struct?
         std::string fontFileName;
         u32* fontImage;
-        u8 fontCharWidth, fontCharHeight;
         u32 fontImageWidth, fontImageHeight;
 
         std::shared_ptr<std::vector<u32>> pixels;
@@ -52,10 +51,15 @@ class Console {
         void copyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
              Rectangle srcRect, u32 srcPixelsPerRow,
              u32 newColor);
+        void simpleCopyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
+             Rectangle srcRect, u32 srcPixelsPerRow,
+             u32 newColor);
         
 
         void generateRandomPixels();
 
         bool dirty = true;
         u32 rows, cols;
+        u8 fontCharWidth, fontCharHeight;
+        Rectangle cellToRectangle(u32 x, u32 y);
 };

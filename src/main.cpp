@@ -16,20 +16,18 @@
 #include "messages.h"
 #include "world.h"
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
 #define FPS_LIMIT      60
 
 // global variables for SDL
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Texture *screen;
+
 std::shared_ptr<Console> console;
 std::shared_ptr<World> world;
 
 long seed;
 boost::random::mt19937 rng;
-const u64 playerID = 1;     // Entity with ID 1 is always the player.
 
 /*
  * Build a cache for a level map, so that we don't need to iterate through a million entities each render loop.
@@ -51,39 +49,6 @@ void buildMapCache(std::shared_ptr<Level> level)
 
 void renderScreen(SDL_Renderer *renderer, SDL_Texture *screen, std::shared_ptr<Console> c)
 {
-    if(c->dirty) {
-        c->clear();
-        // Find all renderable entities
-        /*std::vector<ecs::Entity *> r = ecs::findAllEntitiesWithComponent<Renderable>();
-        for(auto it : r) {
-            // Get position and renderable components
-            Position *pos = it->component<Position>();
-            Renderable *r = it->component<Renderable>();
-            if(pos && r) {
-                c->put(pos->x, pos->y, r->glyph, r->fgColor);
-            } else {
-                std::runtime_error("Renderable component has no position (or vice versa)!");
-            }
-        }*/
-
-        for (u32 x = 0; x < world->level->width; x++) {
-            for (u32 y = 0; y < world->level->height; y++) {
-                if(world->level->cache[x][y].type != cellUnused)
-                    c->put(x, y, world->level->cache[x][y].glyph, world->level->cache[x][y].fgColor);
-            }
-        }
-
-        // Render player
-        Position *pos = ecs::entity(playerID)->component<Position>();
-        Renderable *r = ecs::entity(playerID)->component<Renderable>();
-        c->put(pos->x, pos->y, r->glyph, r->fgColor);
-
-        SDL_UpdateTexture(screen, NULL, c->getPixels(), SCREEN_WIDTH * sizeof(u32));
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, screen, NULL, NULL);
-        SDL_RenderPresent(renderer);
-        c->dirty = false;
-    }
 }
 
 void sdl_init()
@@ -97,7 +62,7 @@ void sdl_init()
             SCREEN_WIDTH, SCREEN_HEIGHT,
             0);
 
-    renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_SOFTWARE);
+    renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -120,6 +85,7 @@ void run(std::function<void(double)> on_tick)
     
     while(!done) {
         SDL_Event event;
+        //u32 startTime = SDL_GetTicks();
         //i32 timePerFrame = 1000 / FPS_LIMIT;
         //i32 frameStart = 0;
 
@@ -132,7 +98,6 @@ void run(std::function<void(double)> on_tick)
                         done = true;
                         break;
                     case SDLK_m:
-                        //ecs::emit(TestMessage {17, 42});
                         break;
                     case SDLK_DOWN:
                     case SDLK_j:
@@ -179,13 +144,15 @@ void run(std::function<void(double)> on_tick)
                     break;
                 }
             }
+
+            on_tick(durationMS);
+
             // Limit FPS
             //i32 sleepTime = timePerFrame - (SDL_GetTicks() - frameStart);
             //if(sleepTime > 0)
-              //  SDL_Delay(sleepTime);
+            //    SDL_Delay(sleepTime);
 
-            on_tick(durationMS);
-            renderScreen(renderer, screen, console);
+            //durationMS = ((SDL_GetTicks() - frameStart) * 1000) / FPS_LIMIT;
 
         }
     }
@@ -215,6 +182,7 @@ int main(int argc, char *argv[])
 
     // add and configure systems
     ecs::addSystem<ActorMovementSystem>();
+    ecs::addSystem<CameraSystem>();
     ecs::configureAllSystems();
     run(tick);
 

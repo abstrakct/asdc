@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <SDL2/SDL.h>
 #include "console.h"
 #include "common.h"
 #include "utils.h"
@@ -165,6 +166,58 @@ void Console::copyBlend(Rectangle *destRect, u32 destPixelsPerRow,
 
 // Again, credits to PT_Console - https://github.com/pdetagyos/RoguelikeTutorial/blob/tutorial-step-01/pt_console.c
 // But modified to work with my implementation
+void Console::simpleCopyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
+                               Rectangle srcRect, u32 srcPixelsPerRow,
+                               u32 newColor)
+{
+    // If src and dest rects are not the same size ==> bad things
+    assert(destRect.w == srcRect.w && destRect.h == srcRect.h);
+
+    // For each pixel in the destination rect, alpha blend to it the 
+    // corresponding pixel in the source rect.
+    // ref: https://en.wikipedia.org/wiki/Alpha_compositing
+
+    u32 stopX = destRect.x + destRect.w;
+    u32 stopY = destRect.y + destRect.h;
+    u32 *firstPixel = pixels->data();
+
+
+
+    for (u32 dstY = destRect.y, srcY = srcRect.y; dstY < stopY; dstY++, srcY++) {
+        for (u32 dstX = destRect.x, srcX = srcRect.x; dstX < stopX; dstX++, srcX++) {
+
+            //u32 srcColor = fontImage[(srcY * srcPixelsPerRow) + srcX];
+            u32 *destPixel = &(firstPixel[(dstY * destPixelsPerRow) + dstX]);
+            //u32 destColor = *destPixel;
+            *destPixel = newColor;
+
+            // Colorize our source pixel before we blend it
+            /*srcColor = PT_ColorizePixel(srcColor, newColor);
+
+            if (ALPHA(srcColor) == 0) {
+                // Source is transparent - so do nothing
+                continue;
+            } else if (ALPHA(srcColor) == 255) {
+                // Just copy the color, no blending necessary
+                *destPixel = srcColor;
+            } else {
+                // Do alpha blending
+                float srcA = ALPHA(srcColor) / 255.0;
+                float invSrcA = (1.0 - srcA);
+                float destA = ALPHA(destColor) / 255.0;
+
+                float outAlpha = srcA + (destA * invSrcA);
+                u8 fRed = ((RED(srcColor) * srcA) + (RED(destColor) * destA * invSrcA)) / outAlpha;
+                u8 fGreen = ((GREEN(srcColor) * srcA) + (GREEN(destColor) * destA * invSrcA)) / outAlpha;
+                u8 fBlue = ((BLUE(srcColor) * srcA) + (BLUE(destColor) * destA * invSrcA)) / outAlpha;
+                u8 fAlpha = outAlpha * 255;
+
+                *destPixel = COLOR_FROM_RGBA(fRed, fGreen, fBlue, fAlpha);
+            }*/
+        }
+    }
+}
+
 void Console::copyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
                                Rectangle srcRect, u32 srcPixelsPerRow,
                                u32 newColor)
@@ -212,4 +265,16 @@ void Console::copyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
             }
         }
     }
+}
+
+Rectangle Console::cellToRectangle(u32 x, u32 y)
+{
+    Rectangle result;
+
+    result.x = x * fontCharWidth;
+    result.y = y * fontCharWidth;
+    result.w = fontCharWidth;
+    result.h = fontCharHeight;
+
+    return result;
 }
