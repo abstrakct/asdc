@@ -52,6 +52,7 @@ void CameraSystem::update(const double durationMS)
         SDL_RenderCopy(renderer, screen, NULL, NULL);
         SDL_RenderPresent(renderer);
         console->dirty = false;
+        // this is a test
     }
     //u32 end = SDL_GetTicks();
     //std::cout << "CameraSystem::update took " << (end - start) << " ms to complete." << std::endl;
