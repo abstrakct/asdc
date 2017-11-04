@@ -1,5 +1,9 @@
 /*
  * console.cpp
+ *
+ * Most of this file was originally take from / inspired by PT_Console at https://github.com/pdetagyos/RoguelikeTutorial/
+ *
+ * I have since migrated from SDL to SFML and rewritten more or less everything in this file.
  */
 
 #include <iostream>
@@ -20,7 +24,6 @@ Console::~Console()
 {
 }
 
-// Taken from / inspired by PT_Console at https://github.com/pdetagyos/RoguelikeTutorial/
 sf::IntRect Console::rectForGlyph(unsigned char c)
 {
     int index = c;
@@ -112,7 +115,6 @@ void Console::render()
     }
 }
 
-// Also inspired by PT_Console
 // x,y = cell coordinates, not pixels!
 void Console::put(u32 cellX, u32 cellY, unsigned char c)
 {
@@ -129,15 +131,6 @@ void Console::put(u32 cellX, u32 cellY, unsigned char c, u32 color)
 
     cell[cellX][cellY].c = c;
     cell[cellX][cellY].fgColor = newColor;
-}
-
-void Console::generateRandomPixels()
-{
-    for(u32 x = 0; x < width; x++) {
-        for(u32 y = 0; y < height; y++) {
-            //pixels->at(y * width + x) = ri(0, 2147483647);
-        }
-    }
 }
 
 Rectangle Console::cellToRectangle(u32 x, u32 y)

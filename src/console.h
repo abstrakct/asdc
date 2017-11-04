@@ -55,8 +55,6 @@ class Console {
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
 
-        void generateRandomPixels();
-
         bool dirty = true;
         u32 rows, cols;
         u32 widthPixels, heightPixels;
