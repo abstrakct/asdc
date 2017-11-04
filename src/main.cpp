@@ -42,14 +42,16 @@ boost::random::mt19937 rng;
  */
 void buildMapCache(std::shared_ptr<Level> level)
 {
+    MapCacheCell tmp;
     for (auto it : level->cells) {
         Position *pos = it->component<Position>();
         Renderable *r = it->component<Renderable>();
         MapCell *cell = it->component<MapCell>();
-        if(pos && r) {
-            level->cache[pos->x][pos->y].type = cell->type;
-            level->cache[pos->x][pos->y].glyph = r->glyph;
-            level->cache[pos->x][pos->y].fgColor = r->fgColor;
+        if(pos && r && cell) {
+            tmp.type = cell->type;
+            tmp.glyph = r->glyph;
+            tmp.fgColor = r->fgColor;
+            level->cache[pos->x][pos->y] = tmp;
         }
     }
 }
@@ -122,7 +124,7 @@ int main(int argc, char *argv[])
     //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
     
     world = std::make_unique<World>();
-    world->addLevel("Dungeon Level 1", 30, 30);
+    world->addLevel("Dungeon Level 1", 20, 20);
     world->setCurrentLevel("Dungeon Level 1");
     world->generate();
     buildMapCache(world->currentLevel);

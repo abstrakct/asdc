@@ -30,7 +30,7 @@ class Level {
 
         u32 width, height;
         std::vector<ecs::Entity *> cells;
-        MapCacheCell **cache; // TODO: is vector faster? probably not, but... maybe?
+        std::array<std::array<MapCacheCell, 256>, 256> cache; // TODO: remove hard coded values!
 };
 
 class World {

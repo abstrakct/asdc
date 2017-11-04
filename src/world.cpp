@@ -35,10 +35,10 @@ Level::Level(u32 w, u32 h)
 
 Level::~Level()
 {
-    for(u32 i = 0; i < height; i++)
-        delete cache[i];
+    //for(u32 i = 0; i < height; i++)
+    //    delete cache[i];
 
-    delete *cache;
+    //delete *cache;
 }
 
 void Level::fill(ecs::Entity* (*makerFunction)(u32 x, u32 y))
@@ -52,17 +52,19 @@ void Level::fill(ecs::Entity* (*makerFunction)(u32 x, u32 y))
 
 void Level::initCache()
 {
-    cache = new MapCacheCell*[width];
-    for (u32 i = 0; i < width; i++)
-        cache[i] = new MapCacheCell[height];
+    //cache.resize(width*height);
+    
+    //cache = new MapCacheCell*[width];
+    //for (u32 i = 0; i < width; i++)
+    //    cache[i] = new MapCacheCell[height];
 
-    for (u32 x = 0; x < width; x++) {
-        for (u32 y = 0; y < height; y++) {
-            cache[x][y].type = cellUnused;
-            cache[x][y].glyph = ' ';
-            cache[x][y].fgColor = 0;
-        }
-    }
+    //for (u32 x = 0; x < width; x++) {
+    //    for (u32 y = 0; y < height; y++) {
+    //        cache[x][y].type = cellUnused;
+    //        cache[x][y].glyph = ' ';
+    //        cache[x][y].fgColor = 0;
+    //    }
+    //}
 }
 
 void Level::generateFrame()
