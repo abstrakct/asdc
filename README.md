@@ -3,7 +3,7 @@
 For now, ASDC stands for "A Simple Dungeon Crawler", but it will likely change.
 It is a project where to goal is to teach myself modern C++ by building a roguelike / dungeon crawler game.
 
-The game uses an Entity-Component-System architecture, and the code for that has been almost 100% taken from [RLTK](https://github.com/thebracket/rltk)
+The game uses an Entity-Component-System architecture, and the code for that has been almost 100% taken from [RLTK](https://github.com/thebracket/rltk).
 
 Instead of just copy-pasting the code, or including it as a library, I typed out all the code I needed and adapted it slightly to fit in with my project.
 I find that this helps me understand the code much better than if I'm just reading the code.
