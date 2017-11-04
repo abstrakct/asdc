@@ -43,6 +43,7 @@ boost::random::mt19937 rng;
  * Also, (TODO) moving around on a large map is really slow, even with this cache and only drawing within FOV. Why????
  * - OK, it now is a bit faster, it seems, with reasonably large maps (e.g. 60x40)
  *   Bumping height to 45 seems to have a big impact though... conclusion: it's probably good enough for now! But larger maps will need optimization / different handling of things.
+ *   FINAL NOTE: building with optimization -O3 pretty much eliminates the problem even on large maps! What did we learn? Let the compiler do its magic! 
  */
 void buildMapCache(std::shared_ptr<Level> level)
 {
@@ -128,7 +129,7 @@ int main(int argc, char *argv[])
     //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
     
     world = std::make_unique<World>();
-    world->addLevel("Dungeon Level 1", 60, 40);
+    world->addLevel("Dungeon Level 1", 80, 80);
     world->setCurrentLevel("Dungeon Level 1");
     world->generate();
     buildMapCache(world->currentLevel);
