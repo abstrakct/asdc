@@ -21,11 +21,11 @@
 #define FPS_LIMIT      60
 
 
-std::unique_ptr<GUI> gui;
 sf::RenderWindow window;
-sf::RenderTexture tex;
+//sf::RenderTexture tex;
 
-std::shared_ptr<World> world;
+std::unique_ptr<GUI> gui;
+std::unique_ptr<World> world;
 
 long seed;
 boost::random::mt19937 rng;
@@ -99,7 +99,7 @@ void initSFML()
     window.setPosition(windowPosition);
     window.setVerticalSyncEnabled(true);
 
-    tex.create(SCREEN_WIDTH, SCREEN_HEIGHT);
+    //tex.create(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 int main(int argc, char *argv[])
@@ -110,7 +110,6 @@ int main(int argc, char *argv[])
     gui = std::make_unique<GUI>(SCREEN_WIDTH, SCREEN_HEIGHT);
     gui->addLayer(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
     gui->addLayer(1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
-    //console->setFont("res/fonts/terminal16x16.png", 16, 16, 256, 256);
 
 
     // Initialize random number generator
@@ -121,9 +120,12 @@ int main(int argc, char *argv[])
     // create player and the world (only one level for now)
     ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(10, 10))->assign(Renderable('@', 0x0055AAFF));
     //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
-    world = std::make_shared<World>(40, 40);
+    
+    world = std::make_unique<World>();
+    world->addLevel("Dungeon Level 1", 30, 30);
+    world->setCurrentLevel("Dungeon Level 1");
     world->generate();
-    buildMapCache(world->level);
+    buildMapCache(world->currentLevel);
 
 
     // add and configure systems

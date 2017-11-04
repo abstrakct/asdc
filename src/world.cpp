@@ -79,16 +79,20 @@ void Level::generateFrame()
 
 void World::generate()
 {
-    level->fill(makeFloor);
-    level->generateFrame();
-    currentLevel = level;
-    //for (u32 x = 0; x < level->width; x++) {
-    //    for (u32 y = 0; y < level->height; y++) {
-    //        if(fiftyfifty()) {
-    //            level->cells.push_back(makeWall(x, y));
-    //        }
-    //    }
-    //}
+    currentLevel->fill(makeFloor);
+    currentLevel->generateFrame();
+    for (u32 x = 0; x < currentLevel->width; x++) {
+        for (u32 y = 0; y < currentLevel->height; y++) {
+            if(one_in(4)) {
+                currentLevel->cells.push_back(makeWall(x, y));
+            }
+        }
+    }
+}
+
+void World::addLevel(std::string levelName, u32 w, u32 h)
+{
+    level[levelName] = std::make_shared<Level>(w, h);
 }
 
 /*

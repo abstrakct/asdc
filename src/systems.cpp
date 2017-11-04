@@ -12,7 +12,7 @@
 
 #define con gui->getLayer(0)->console
 extern std::unique_ptr<GUI> gui;
-extern std::shared_ptr<World> world;
+extern std::unique_ptr<World> world;
 
 extern sf::RenderWindow window;
 extern sf::RenderTexture tex;
@@ -35,13 +35,13 @@ void CameraSystem::update(const double durationMS)
 
         if (startx <= 0) startx = 0;
         if (starty <= 0) starty = 0;
-        if (endx >= world->currentLevel->width)  endx = world->currentLevel->width - 1;
+        if (endx >= world->currentLevel->width)  endx = world->currentLevel->width  - 1;
         if (endy >= world->currentLevel->height) endy = world->currentLevel->height - 1;
 
         for (i32 x = startx; x <= (i32)endx; x++) {
             for (i32 y = starty; y <= (i32)endy; y++) {
-                if(world->level->cache[x][y].type != cellUnused)
-                    con->put(x, y, world->level->cache[x][y].glyph, world->level->cache[x][y].fgColor);
+                if(world->currentLevel->cache[x][y].type != cellUnused)
+                    con->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fgColor);
             }
         }
 

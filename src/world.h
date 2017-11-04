@@ -37,11 +37,14 @@ class World {
     private:
     public:
         World() {};
-        World(u32 w, u32 h) {
-            level = std::make_shared<Level>(w, h);
-        };
 
         void generate();
-        std::shared_ptr<Level> level;
+        void addLevel(std::string levelName, u32 w, u32 h);
+        void setCurrentLevel(std::string name) {
+            if(level.find(name) != level.end())
+                currentLevel = level[name];
+        }
+
+        std::unordered_map<std::string, std::shared_ptr<Level>> level;
         std::shared_ptr<Level> currentLevel;
 };
