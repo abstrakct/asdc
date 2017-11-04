@@ -2,6 +2,8 @@
  * console.h
  */
 
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -29,7 +31,7 @@ struct Cell {
 // TODO: support cells with different size than the font?? e.g. 8x8 fonts in 16x16 cells?!
 class Console {
     private:
-        u32 width, height;
+        u32 widthInPixels, heightInPixels;
 
         // Separate font to its own class/struct?
         std::string fontFileName;
@@ -43,6 +45,7 @@ class Console {
         void createSprites();
     public:
         Console(u32 w, u32 h);
+        //Console(u32 w, u32 h, std::string font);
         ~Console();
 
         void setFont(std::string font, u8 cw, u8 ch, u32 iw, u32 ih);
@@ -50,14 +53,14 @@ class Console {
         void fillColor(u32 color);
         void fillChar(unsigned char c);
         void clear();
-        void render();
+        void render(sf::RenderWindow &window);
 
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
 
         bool dirty = true;
-        u32 rows, cols;
-        u32 widthPixels, heightPixels;
+        u32 widthInChars;
+        u32 heightInChars;
         u8 fontCharWidth, fontCharHeight;
         Rectangle cellToRectangle(u32 x, u32 y);
 };

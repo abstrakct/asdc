@@ -14,10 +14,10 @@
 
 ecs::Entity* makeWall(u32 x, u32 y)
 {
-    // TODO: look for already created cell at position?!
-    // yes. we will need a good function for finding entities at a certain position (that is, with a Position component matching what we're looking for)
+    // TODO: look for already created map cell at position! 
+    // yes. we will need a good function for finding entities at a certain position (that is, with a Position component matching what we're looking for, or a specific subset of components, e.g. mapcell & position)
     
-    return ecs::createEntity()->assign(Position(x, y))->assign(Renderable(WALL_GLYPH, WALL_COLOR))->assign(MapCell(cellWall))->assign(Physicality(true, false));
+    return ecs::createEntity()->assign(Position(x, y))->assign(Renderable(WALL_GLYPH, WALL_COLOR))->assign(MapCell(cellWall))->assign(Physicality(true, true));
 
 }
 
@@ -81,13 +81,13 @@ void World::generate()
 {
     level->fill(makeFloor);
     level->generateFrame();
-    for (u32 x = 0; x < level->width; x++) {
-        for (u32 y = 0; y < level->height; y++) {
-            if(fiftyfifty()) {
-                level->cells.push_back(makeWall(x, y));
-            }
-        }
-    }
+    //for (u32 x = 0; x < level->width; x++) {
+    //    for (u32 y = 0; y < level->height; y++) {
+    //        if(fiftyfifty()) {
+    //            level->cells.push_back(makeWall(x, y));
+    //        }
+    //    }
+    //}
 }
 
 /*

@@ -318,6 +318,16 @@ struct BaseSystem {
         static_cast<SubscriptionHolder<MSG> *>(pubsubHolder[handle.familyID].get())->subscriptions.push_back(std::make_tuple(false, destination, this));
         mailboxes[handle.familyID] = std::make_unique<Mailbox<MSG>>();
     }
+
+    template<class MSG> std::queue<MSG> *mbox() {
+        Message<MSG> handle(MSG{});
+        auto finder = mailboxes.find(handle.familyID);
+        if (finder != mailboxes.end()) {
+            return &static_cast<Mailbox<MSG> *>(finder->second.get())->messages;
+        } else {
+            return nullptr;
+        }
+    }
 };
 
 template<typename S, typename ...Args>

@@ -1,6 +1,9 @@
 /*
  * console.cpp
  *
+ * As of now it can handle drawing characters from a .png bitmap font file to the screen.
+ * Should be expanded.
+ *
  * Most of this file was originally take from / inspired by PT_Console at https://github.com/pdetagyos/RoguelikeTutorial/
  *
  * I have since migrated from SDL to SFML and rewritten more or less everything in this file.
@@ -12,12 +15,19 @@
 #include "utils.h"
 
 extern sf::RenderWindow window;
+extern sf::RenderTexture tex;
 
 Console::Console(u32 w, u32 h)
 {
-    width = w;
-    height = h;
+    widthInPixels = w;
+    heightInPixels = h;
 }
+
+//Console::Console(u32 w, u32 h, std::string font)
+//{
+//    widthInPixels = w;
+//    heightInPixels = h;
+//}
 
 Console::~Console()
 {
@@ -41,12 +51,12 @@ void Console::setFont(std::string font, u8 cw, u8 ch, u32 iw, u32 ih)
     fontCharHeight = ch;
     fontImageWidth = iw;
     fontImageHeight = ih;
-    rows = height / fontCharHeight;
-    cols = width  / fontCharWidth;
+    heightInChars = heightInPixels / fontCharHeight;
+    widthInChars = widthInPixels / fontCharWidth;
 
     // initialize cells
-    for(u32 x = 0; x < cols; x++) {
-        for(u32 y = 0; y < rows; y++) {
+    for(u32 x = 0; x < widthInChars; x++) {
+        for(u32 y = 0; y < heightInChars; y++) {
             cell[x][y].c = 0;
             cell[x][y].fgColor = sf::Color::White;
             cell[x][y].bgColor = sf::Color::Black;
@@ -77,8 +87,8 @@ void Console::fillColor(u32 color)
     newColor.g = GREEN(color);
     newColor.b = BLUE(color);
     newColor.a = ALPHA(color);
-    for (u32 y = 0; y < rows; y++) {
-        for (u32 x = 0; x < cols; x++) {
+    for (u32 y = 0; y < heightInChars; y++) {
+        for (u32 x = 0; x < widthInChars; x++) {
             cell[x][y].fgColor = newColor;
         }
     }
@@ -87,8 +97,8 @@ void Console::fillColor(u32 color)
 
 void Console::fillChar(unsigned char c)
 {
-    for (u32 y = 0; y < rows; y++) {
-        for (u32 x = 0; x < cols; x++) {
+    for (u32 y = 0; y < heightInChars; y++) {
+        for (u32 x = 0; x < widthInChars; x++) {
             cell[x][y].c = c;
         }
     }
@@ -99,11 +109,11 @@ void Console::clear()
     fillChar(0);
 }
 
-void Console::render()
+void Console::render(sf::RenderWindow &window)
 {
     // Go through cells, render all to pixels
-    for (u32 y = 0; y < rows; y++) {
-        for (u32 x = 0; x < cols; x++) {
+    for (u32 y = 0; y < heightInChars; y++) {
+        for (u32 x = 0; x < widthInChars; x++) {
             unsigned char c = cell[x][y].c;
             if(c) {
                 fontSprite[c].setPosition(x*fontCharWidth, y*fontCharHeight);

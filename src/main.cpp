@@ -21,17 +21,24 @@
 #define FPS_LIMIT      60
 
 
+std::unique_ptr<GUI> gui;
 sf::RenderWindow window;
+sf::RenderTexture tex;
 
-std::shared_ptr<Console> console;
 std::shared_ptr<World> world;
 
 long seed;
 boost::random::mt19937 rng;
 
+// NEXT TODO:
+// Build a GUI class that can handle multiple consoles/layers of various sizes.
+
+
 /*
  * Build a cache for a level map, so that we don't need to iterate through a million entities each render loop.
  * Cache is a 2D array inside the Level class that gets allocated in the constructor.
+ * Takes a little while to get done, but only needs to be done once for each level.
+ * Might need a more clever way of doing it if we get into more advanced levels or something...
  */
 void buildMapCache(std::shared_ptr<Level> level)
 {
@@ -56,80 +63,29 @@ void tick(double duration_ms) {
 void run(std::function<void(double)> on_tick)
 {
     double durationMS = 0.0;
-
-    // loop
     bool done = false;
-    
-    while(!done) {
+
+
+    while(window.isOpen() && !done) {
+        clock_t startTime = clock();
         sf::Event event;
-        //u32 startTime = SDL_GetTicks();
-        //i32 timePerFrame = 1000 / FPS_LIMIT;
-        //i32 frameStart = 0;
 
-        while(window.pollEvent(event)) {
-            //frameStart = SDL_GetTicks();
-            if(event.type == sf::Event::KeyPressed) {
-                switch(event.key.code) {
-                    case sf::Keyboard::Escape:
-                        done = true;
-                        break;
-                    case sf::Keyboard::Down:
-                    case sf::Keyboard::J:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID),  0,  1 });
-                        console->dirty = true;
-                        break;
-                    case sf::Keyboard::Up:
-                    case sf::Keyboard::K:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID), 0, -1 });
-                        console->dirty = true;
-                        break;
-                    case sf::Keyboard::Left:
-                    case sf::Keyboard::H:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1,  0 });
-                        console->dirty = true;
-                        break;
-                    case sf::Keyboard::Right:
-                    case sf::Keyboard::L:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1,  0 });
-                        console->dirty = true;
-                        break;
-                    case sf::Keyboard::Y:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1, -1 });
-                        console->dirty = true;
-                        break;
-                    case sf::Keyboard::U:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1, -1 });
-                        console->dirty = true;
-                        break;
-                    case sf::Keyboard::B:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1,  1 });
-                        console->dirty = true;
-                        break;
-                    case sf::Keyboard::N:
-                        ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1,  1 });
-                        console->dirty = true;
-                        break;
-                    default:
-                        break;
-                }
-
-                if(event.type == sf::Event::Closed) {
-                    done = true;
-                    break;
-                }
-            }
-
-            on_tick(durationMS);
-
-            // Limit FPS
-            //i32 sleepTime = timePerFrame - (SDL_GetTicks() - frameStart);
-            //if(sleepTime > 0)
-            //    SDL_Delay(sleepTime);
-
-            //durationMS = ((SDL_GetTicks() - frameStart) * 1000) / FPS_LIMIT;
-
-            //window.display();
+        while(window.pollEvent(event)) {    // waitEvent bedre??
+            if(event.type == sf::Event::Closed)
+                done = true;
+            if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+                done = true;
+            if(event.type == sf::Event::KeyPressed)
+                ecs::emit(KeyPressed{event});
         }
+
+        //window.clear();
+        
+        on_tick(durationMS);
+
+        window.display();
+
+        durationMS = ((clock() - startTime) * 1000.0) / CLOCKS_PER_SEC;
     }
 }
 
@@ -141,6 +97,9 @@ void initSFML()
     windowPosition.x = 300;
     windowPosition.y = 200;
     window.setPosition(windowPosition);
+    window.setVerticalSyncEnabled(true);
+
+    tex.create(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 int main(int argc, char *argv[])
@@ -148,9 +107,9 @@ int main(int argc, char *argv[])
     initSFML();
 
     // Initialize console
-    console = std::make_shared<Console>(SCREEN_WIDTH, SCREEN_HEIGHT);
-    console->setFont("res/fonts/terminal16x16.png", 16, 16, 256, 256);
-    console->clear();
+    gui = std::make_unique<GUI>(SCREEN_WIDTH, SCREEN_HEIGHT);
+    gui->addLayer(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
+    //console->setFont("res/fonts/terminal16x16.png", 16, 16, 256, 256);
 
 
     // Initialize random number generator
@@ -160,14 +119,15 @@ int main(int argc, char *argv[])
 
     // create player and the world (only one level for now)
     ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(40, 25))->assign(Renderable('@', 0x0055AAFF));
-    world = std::make_shared<World>(console->cols, console->rows);
+    world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
     world->generate();
     buildMapCache(world->level);
 
 
     // add and configure systems
-    ecs::addSystem<ActorMovementSystem>();
+    ecs::addSystem<PlayerSystem>();
     ecs::addSystem<CameraSystem>();
+    ecs::addSystem<ActorMovementSystem>();
     ecs::configureAllSystems();
 
     // RUN!

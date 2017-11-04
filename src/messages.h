@@ -12,3 +12,6 @@ struct ActorMovedMessage : ecs::BaseMessage {
     ecs::Entity *actor;
     i32 dx, dy;
 };
+
+struct PlayerMovedMessage : ecs::BaseMessage {
+};
