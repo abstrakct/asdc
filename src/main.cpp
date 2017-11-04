@@ -20,15 +20,8 @@
 
 #define FPS_LIMIT      60
 
-// global variables for SDL
-//SDL_Window *window;
-//SDL_Renderer *renderer;
-//SDL_Texture *screen;
 
 sf::RenderWindow window;
-//sf::RenderTexture renderTexture;
-sf::Texture tex;
-sf::Sprite sprite;
 
 std::shared_ptr<Console> console;
 std::shared_ptr<World> world;
@@ -143,11 +136,6 @@ void run(std::function<void(double)> on_tick)
 void initSFML()
 {
     window.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "asdc");
-
-    //if (!renderTexture.create(SCREEN_WIDTH, SCREEN_HEIGHT))
-    //    std::runtime_error("Couldn't create SFML render texture!");
-
-    tex.create(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 int main(int argc, char *argv[])

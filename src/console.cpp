@@ -11,7 +11,6 @@
 #include "common.h"
 #include "utils.h"
 
-extern sf::Texture tex;
 extern sf::RenderWindow window;
 
 Console::Console(u32 w, u32 h)

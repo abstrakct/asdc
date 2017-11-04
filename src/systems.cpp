@@ -11,10 +11,7 @@
 
 extern std::shared_ptr<Console> console;
 extern std::shared_ptr<World> world;
-//extern sf::RenderTexture renderTexture;
 extern sf::RenderWindow window;
-extern sf::Texture tex;
-extern sf::Sprite sprite;
 
 void CameraSystem::update(const double durationMS)
 {
