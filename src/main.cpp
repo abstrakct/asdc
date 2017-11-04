@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
     // Initialize console
     gui = std::make_unique<GUI>(SCREEN_WIDTH, SCREEN_HEIGHT);
     gui->addLayer(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
+    gui->addLayer(1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
     //console->setFont("res/fonts/terminal16x16.png", 16, 16, 256, 256);
 
 
@@ -118,8 +119,9 @@ int main(int argc, char *argv[])
 
 
     // create player and the world (only one level for now)
-    ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(40, 25))->assign(Renderable('@', 0x0055AAFF));
-    world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
+    ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(10, 10))->assign(Renderable('@', 0x0055AAFF));
+    //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
+    world = std::make_shared<World>(40, 40);
     world->generate();
     buildMapCache(world->level);
 

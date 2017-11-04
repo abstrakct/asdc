@@ -43,4 +43,5 @@ class World {
 
         void generate();
         std::shared_ptr<Level> level;
+        std::shared_ptr<Level> currentLevel;
 };

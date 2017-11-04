@@ -81,6 +81,7 @@ void World::generate()
 {
     level->fill(makeFloor);
     level->generateFrame();
+    currentLevel = level;
     //for (u32 x = 0; x < level->width; x++) {
     //    for (u32 y = 0; y < level->height; y++) {
     //        if(fiftyfifty()) {
