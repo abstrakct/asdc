@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <SFML/Graphics.hpp>
 
 #include "common.h"
 
@@ -19,6 +20,12 @@ struct Rectangle {
     u32 x, y, w, h;
 };
 
+struct Cell {
+    unsigned char c;
+    sf::Color fgColor;
+    sf::Color bgColor;
+};
+
 // TODO: support cells with different size than the font?? e.g. 8x8 fonts in 16x16 cells?!
 class Console {
     private:
@@ -28,19 +35,24 @@ class Console {
         std::string fontFileName;
         u32* fontImage;
         u32 fontImageWidth, fontImageHeight;
+        sf::Texture fontTexture;
+        sf::Sprite fontSprite[256];
+        u8* pixels;
+        Cell cell[256][256];            // TODO: remove hard coded max values
 
-        std::shared_ptr<std::vector<u32>> pixels;
-
-        Rectangle rectForGlyph(unsigned char c);
+        sf::IntRect rectForGlyph(unsigned char c);
+        void createSprites();
     public:
         Console(u32 w, u32 h);
-        ~Console() = default;
+        ~Console();
 
-        void setFont(std::string font, u8 cw, u8 ch);
-        u32* getPixels() { return pixels->data(); };
-        void fill(u32 color);
-        void fill(Rectangle r, u32 color);
+        void setFont(std::string font, u8 cw, u8 ch, u32 iw, u32 ih);
+        u8* getPixels() { return pixels; };
+        void fillColor(u32 color);
+        void fillChar(unsigned char c);
+        //void fill(Rectangle r, u32 color);
         void clear();
+        void render();
 
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
@@ -60,6 +72,7 @@ class Console {
 
         bool dirty = true;
         u32 rows, cols;
+        u32 widthPixels, heightPixels;
         u8 fontCharWidth, fontCharHeight;
         Rectangle cellToRectangle(u32 x, u32 y);
 };

@@ -2,9 +2,11 @@
  * main.cpp
  */
 
-#include <SDL2/SDL.h>
-#include <stdint.h>
+// SFML
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
+#include <stdint.h>
 #include <iostream>
 #include <memory>
 
@@ -19,9 +21,14 @@
 #define FPS_LIMIT      60
 
 // global variables for SDL
-SDL_Window *window;
-SDL_Renderer *renderer;
-SDL_Texture *screen;
+//SDL_Window *window;
+//SDL_Renderer *renderer;
+//SDL_Texture *screen;
+
+sf::RenderWindow window;
+//sf::RenderTexture renderTexture;
+sf::Texture tex;
+sf::Sprite sprite;
 
 std::shared_ptr<Console> console;
 std::shared_ptr<World> world;
@@ -47,29 +54,6 @@ void buildMapCache(std::shared_ptr<Level> level)
     }
 }
 
-void renderScreen(SDL_Renderer *renderer, SDL_Texture *screen, std::shared_ptr<Console> c)
-{
-}
-
-void sdl_init()
-{
-    // TODO: SDL error checking
-    SDL_Init(SDL_INIT_VIDEO);
-
-    window = SDL_CreateWindow("asdc",
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
-            SCREEN_WIDTH, SCREEN_HEIGHT,
-            0);
-
-    renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
-
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-}
-
 // Tick is called every frame. The parameter specifies how many ms have elapsed
 // since the last time it was called.
 void tick(double duration_ms) {
@@ -84,54 +68,51 @@ void run(std::function<void(double)> on_tick)
     bool done = false;
     
     while(!done) {
-        SDL_Event event;
+        sf::Event event;
         //u32 startTime = SDL_GetTicks();
         //i32 timePerFrame = 1000 / FPS_LIMIT;
         //i32 frameStart = 0;
 
-        while(SDL_PollEvent(&event) != 0) {
+        while(window.pollEvent(event)) {
             //frameStart = SDL_GetTicks();
-            if(event.type == SDL_KEYDOWN) {
-                SDL_Keycode key = event.key.keysym.sym;
-                switch(key) {
-                    case SDLK_ESCAPE:
+            if(event.type == sf::Event::KeyPressed) {
+                switch(event.key.code) {
+                    case sf::Keyboard::Escape:
                         done = true;
                         break;
-                    case SDLK_m:
-                        break;
-                    case SDLK_DOWN:
-                    case SDLK_j:
+                    case sf::Keyboard::Down:
+                    case sf::Keyboard::J:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID),  0,  1 });
                         console->dirty = true;
                         break;
-                    case SDLK_UP:
-                    case SDLK_k:
+                    case sf::Keyboard::Up:
+                    case sf::Keyboard::K:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID), 0, -1 });
                         console->dirty = true;
                         break;
-                    case SDLK_LEFT:
-                    case SDLK_h:
+                    case sf::Keyboard::Left:
+                    case sf::Keyboard::H:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1,  0 });
                         console->dirty = true;
                         break;
-                    case SDLK_RIGHT:
-                    case SDLK_l:
+                    case sf::Keyboard::Right:
+                    case sf::Keyboard::L:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1,  0 });
                         console->dirty = true;
                         break;
-                    case SDLK_y:
+                    case sf::Keyboard::Y:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1, -1 });
                         console->dirty = true;
                         break;
-                    case SDLK_u:
+                    case sf::Keyboard::U:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1, -1 });
                         console->dirty = true;
                         break;
-                    case SDLK_b:
+                    case sf::Keyboard::B:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID),-1,  1 });
                         console->dirty = true;
                         break;
-                    case SDLK_n:
+                    case sf::Keyboard::N:
                         ecs::emit(ActorMovedMessage { ecs::entity(playerID), 1,  1 });
                         console->dirty = true;
                         break;
@@ -139,7 +120,7 @@ void run(std::function<void(double)> on_tick)
                         break;
                 }
 
-                if(event.type == SDL_QUIT) {
+                if(event.type == sf::Event::Closed) {
                     done = true;
                     break;
                 }
@@ -154,17 +135,28 @@ void run(std::function<void(double)> on_tick)
 
             //durationMS = ((SDL_GetTicks() - frameStart) * 1000) / FPS_LIMIT;
 
+            //window.display();
         }
     }
 }
 
+void initSFML()
+{
+    window.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "asdc");
+
+    //if (!renderTexture.create(SCREEN_WIDTH, SCREEN_HEIGHT))
+    //    std::runtime_error("Couldn't create SFML render texture!");
+
+    tex.create(SCREEN_WIDTH, SCREEN_HEIGHT);
+}
+
 int main(int argc, char *argv[])
 {
-    sdl_init();
+    initSFML();
 
     // Initialize console
     console = std::make_shared<Console>(SCREEN_WIDTH, SCREEN_HEIGHT);
-    console->setFont("res/fonts/terminal16x16.png", 16, 16);
+    console->setFont("res/fonts/terminal16x16.png", 16, 16, 256, 256);
     console->clear();
 
 
@@ -184,14 +176,12 @@ int main(int argc, char *argv[])
     ecs::addSystem<ActorMovementSystem>();
     ecs::addSystem<CameraSystem>();
     ecs::configureAllSystems();
+
+    // RUN!
     run(tick);
 
-
-    // Destroy everything
-    SDL_DestroyTexture(screen);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    // Destroy everything and exit
+    window.close();
 
     return 0;
 }
