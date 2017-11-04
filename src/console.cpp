@@ -14,16 +14,10 @@ Console::Console(u32 w, u32 h)
 {
     width = w;
     height = h;
-
-    widthPixels = width * 4;
-    heightPixels = height * 4;
-    
-    pixels = (u8*) malloc(sizeof(u8) * widthPixels * heightPixels);
 }
 
 Console::~Console()
 {
-    free(pixels);
 }
 
 // Taken from / inspired by PT_Console at https://github.com/pdetagyos/RoguelikeTutorial/

@@ -37,7 +37,6 @@ class Console {
         u32 fontImageWidth, fontImageHeight;
         sf::Texture fontTexture;
         sf::Sprite fontSprite[256];
-        u8* pixels;
         Cell cell[256][256];            // TODO: remove hard coded max values
 
         sf::IntRect rectForGlyph(unsigned char c);
@@ -47,26 +46,14 @@ class Console {
         ~Console();
 
         void setFont(std::string font, u8 cw, u8 ch, u32 iw, u32 ih);
-        u8* getPixels() { return pixels; };
+
         void fillColor(u32 color);
         void fillChar(unsigned char c);
-        //void fill(Rectangle r, u32 color);
         void clear();
         void render();
 
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
-
-        void copyBlend(Rectangle *destRect, u32 destPixelsPerRow,
-             Rectangle *srcRect, u32 srcPixelsPerRow,
-             u32 *newColor);
-        void copyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
-             Rectangle srcRect, u32 srcPixelsPerRow,
-             u32 newColor);
-        void simpleCopyFontToPixels(Rectangle destRect, u32 destPixelsPerRow,
-             Rectangle srcRect, u32 srcPixelsPerRow,
-             u32 newColor);
-        
 
         void generateRandomPixels();
 
