@@ -51,6 +51,13 @@ void CameraSystem::update(const double durationMS)
         // draw everything to screen.
         window.clear(sf::Color::Black);
         gui->render(window);
+        
+        //con->render(window, startx, starty, endx, endy);
+        //sf::Sprite s;
+        //s.setTexture(tex.getTexture());
+        //window.draw(s);
+        //window.display();
+
         con->dirty = false;
 
         // Question: is it quicker to draw pixels myself instead of sprites/textures? Probably not?

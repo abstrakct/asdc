@@ -112,8 +112,23 @@ void Console::clear()
 void Console::render(sf::RenderWindow &window)
 {
     // Go through cells, render all to pixels
-    for (u32 y = 0; y < heightInChars; y++) {
-        for (u32 x = 0; x < widthInChars; x++) {
+    for (u32 x = 0; x < widthInChars; x++) {
+        for (u32 y = 0; y < heightInChars; y++) {
+            unsigned char c = cell[x][y].c;
+            if(c) {
+                fontSprite[c].setPosition(x*fontCharWidth, y*fontCharHeight);
+                fontSprite[c].setColor(cell[x][y].fgColor);
+                window.draw(fontSprite[c]);
+            }
+        }
+    }
+}
+
+void Console::render(sf::RenderWindow &window, u32 startx, u32 starty, u32 endx, u32 endy)
+{
+    // Go through cells, render all to pixels
+    for (u32 x = startx; x <= endx; x++) {
+        for (u32 y = starty; y <= endy; y++) {
             unsigned char c = cell[x][y].c;
             if(c) {
                 fontSprite[c].setPosition(x*fontCharWidth, y*fontCharHeight);

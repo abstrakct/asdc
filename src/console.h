@@ -54,6 +54,7 @@ class Console {
         void fillChar(unsigned char c);
         void clear();
         void render(sf::RenderWindow &window);
+        void render(sf::RenderWindow &window, u32 x, u32 y, u32 w, u32 h);
 
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
