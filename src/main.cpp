@@ -136,6 +136,11 @@ void run(std::function<void(double)> on_tick)
 void initSFML()
 {
     window.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "asdc");
+    sf::Vector2i windowPosition;
+    // TODO: remove hard coded values, set position to center of screen
+    windowPosition.x = 300;
+    windowPosition.y = 200;
+    window.setPosition(windowPosition);
 }
 
 int main(int argc, char *argv[])
@@ -154,8 +159,8 @@ int main(int argc, char *argv[])
 
 
     // create player and the world (only one level for now)
-    ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(25, 20))->assign(Renderable('@', 0x0055AAFF));
-    world = std::make_shared<World>(console->rows, console->cols);
+    ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(40, 25))->assign(Renderable('@', 0x0055AAFF));
+    world = std::make_shared<World>(console->cols, console->rows);
     world->generate();
     buildMapCache(world->level);
 

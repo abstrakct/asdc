@@ -20,16 +20,20 @@ void CameraSystem::update(const double durationMS)
         Position *pos = ecs::entity(playerID)->component<Position>();
         Renderable *r = ecs::entity(playerID)->component<Renderable>();
 
-        window.clear(sf::Color::Black);
         console->clear();
 
-        // TODO: more boundary checks!!!!!
         i32 startx = (pos->x - FOV);
-        if(startx <= 0) startx = 0;
+        u32 endx   = (pos->x + FOV);
         i32 starty = (pos->y - FOV);
-        if(starty <= 0) starty = 0;
-        for (u32 x = startx; x <= (pos->x + FOV); x++) {
-            for (u32 y = starty; y <= (pos->y + FOV); y++) {
+        u32 endy   = (pos->y + FOV);
+
+        if (startx <= 0) startx = 0;
+        if (starty <= 0) starty = 0;
+        if (endx >= console->cols) endx = console->cols-1;
+        if (endy >= console->cols) endy = console->rows-1;
+
+        for (i32 x = startx; x <= (i32)endx; x++) {
+            for (i32 y = starty; y <= (i32)endy; y++) {
                 if(world->level->cache[x][y].type != cellUnused)
                     console->put(x, y, world->level->cache[x][y].glyph, world->level->cache[x][y].fgColor);
             }
@@ -41,22 +45,15 @@ void CameraSystem::update(const double durationMS)
         // draw everything to screen.
         window.clear(sf::Color::Black);
         console->render();
+        window.display();
+        console->dirty = false;
 
+        // Question: is it quicker to draw pixels myself instead of sprites/textures? Probably not?
         //sf::Uint8 *pixels = console->getPixels();
         //tex.update(pixels);
         //window.draw(sprite); 
         // tex.loadfrommemory?
         //tex.update(console->getPixels());
-        
-        window.display();
-        
-        /*SDL_LockTexture(screen, NULL, &pix, &pitch);
-        SDL_memcpy(pix, console->getPixels(), SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(u32));
-        SDL_UnlockTexture(screen);
-
-        SDL_RenderCopy(renderer, screen, NULL, NULL);
-        SDL_RenderPresent(renderer);*/
-        console->dirty = false;
     }
     //u32 end = SDL_GetTicks();
     //std::cout << "CameraSystem::update took " << (end - start) << " ms to complete." << std::endl;

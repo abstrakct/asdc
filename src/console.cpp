@@ -41,8 +41,8 @@ void Console::setFont(std::string font, u8 cw, u8 ch, u32 iw, u32 ih)
     fontCharHeight = ch;
     fontImageWidth = iw;
     fontImageHeight = ih;
-    rows = width / fontCharWidth;
-    cols = height / fontCharHeight;
+    rows = height / fontCharHeight;
+    cols = width  / fontCharWidth;
 
     // initialize cells
     for(u32 x = 0; x < cols; x++) {
@@ -120,7 +120,7 @@ void Console::put(u32 cellX, u32 cellY, unsigned char c)
     cell[cellX][cellY].c = c;
 }
 
-void Console::put(u32 cellX, u32 cellY, unsigned char c, u32 color)
+void Console::put(u32 x, u32 y, unsigned char c, u32 color)
 {
     sf::Color newColor;
     newColor.r = RED(color);
@@ -128,8 +128,8 @@ void Console::put(u32 cellX, u32 cellY, unsigned char c, u32 color)
     newColor.b = BLUE(color);
     newColor.a = ALPHA(color);
 
-    cell[cellX][cellY].c = c;
-    cell[cellX][cellY].fgColor = newColor;
+    cell[x][y].c = c;
+    cell[x][y].fgColor = newColor;
 }
 
 Rectangle Console::cellToRectangle(u32 x, u32 y)
