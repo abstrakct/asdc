@@ -13,7 +13,8 @@ SRC_EXT = cpp
 # Path to the source directory, relative to the makefile
 SRC_PATH = src
 # General compiler flags
-COMPILE_FLAGS = -Wall -Wextra -std=c++14 -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function
+#COMPILE_FLAGS = -Wall -Wextra -std=c++14 -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function
+COMPILE_FLAGS = -Wall -Wextra -std=c++14 -Wno-unused-parameter
 # Additional release-specific flags
 RCOMPILE_FLAGS = -D NDEBUG -O3
 # Additional debug-specific flags
@@ -101,10 +102,10 @@ echo "#endif" >> src/version.h;)
 .PHONY: release
 release: dirs
 	@echo "Beginning release build v$(VERSION_STRING)"
-	@$(START_TIME)
+	#@$(START_TIME)
 	@$(MAKE) all --no-print-directory
-	@echo -n "Total build time: "
-	@$(END_TIME)
+	#@echo -n "Total build time: "
+	#@$(END_TIME)
 
 # Debug build for gdb debugging
 .PHONY: debug

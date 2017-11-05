@@ -166,6 +166,15 @@ void Console::put(u32 x, u32 y, unsigned char c, u32 color)
     cell[x][y].fgColor = newColor;
 }
 
+void Console::print(int x, int y, std::string text)
+{
+    // TODO: ERROR checking etc!
+    for (auto c : text) {
+        put(x, y, c);
+        x++;
+    }
+}
+
 Rectangle Console::cellToRectangle(u32 x, u32 y)
 {
     Rectangle result;

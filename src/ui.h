@@ -24,6 +24,20 @@ struct KeyPressed {
     sf::Event event;
 };
 
+struct GuiControl {
+    virtual void render(std::shared_ptr<Console> console) = 0;
+    // TODO: add mouse stuff, callbacks?
+};
+
+struct GuiStaticText : public GuiControl {
+    // TODO: add color
+    GuiStaticText(const int X, const int Y, const std::string txt) : x(X), y(Y), text(txt) {};
+    virtual void render(std::shared_ptr<Console> console) override;
+
+    int x, y;
+    std::string text = "";
+};
+
 struct Layer {
     Layer(const int X, const int Y, const int W, const int H, std::string fontName) :
         x(X), y(Y), w(W), h(H), font(fontName) {
@@ -31,13 +45,28 @@ struct Layer {
             console->setFont(fontName, 16, 16, 256, 256);  // TODO: remove hard coded values!
         }
 
+    template<class T> T* control(const int handle) {
+        auto finder = controls.find(handle);
+        if (finder == controls.end()) throw std::runtime_error("Unknown GUI control handle: " + std::to_string(handle));
+        return static_cast<T*>(finder->second.get());
+    }
+
+    inline void checkHandleUniqueness(const int handle) {
+        auto finder = controls.find(handle);
+        if (finder != controls.end()) throw std::runtime_error("Adding duplicate GUI control handle: " + std::to_string(handle));
+    }
+
+    inline void addStaticText(const int handle, const int x, const int y, const std::string text) {
+        checkHandleUniqueness(handle);
+        controls.emplace(handle, std::make_unique<GuiStaticText>(x, y, text));
+    }
+
     void render(sf::RenderWindow &window);
     int x, y, w, h;
     std::string font;
     std::shared_ptr<Console> console;
+    std::unordered_map<int, std::unique_ptr<GuiControl>> controls;
 };
-
-// TODO: add controls, rendering order
 
 class GUI {
     public:
@@ -57,3 +86,5 @@ class GUI {
         }
 };
 
+extern std::unique_ptr<GUI> gui;
+inline Layer* layer(const int &handle) { return gui->getLayer(handle); };

@@ -6,6 +6,8 @@
 
 #include "ui.h"
 
+// TODO: Add layer blending?
+
 std::vector<std::pair<int, Layer*>> RenderOrderDetail;
 
 void GUI::render(sf::RenderWindow &window)
@@ -42,5 +44,16 @@ void GUI::addLayer(const int handle, const int X, const int Y, const int W, cons
 
 void Layer::render(sf::RenderWindow &window)
 {
+    if (!controls.empty()) {
+        for (auto it = controls.begin(); it != controls.end(); ++it) {
+            it->second->render(console);
+        }
+    }
+
     console->render(window);
+}
+
+void GuiStaticText::render(std::shared_ptr<Console> console)
+{
+    console->print(x, y, text);
 }

@@ -23,4 +23,4 @@ extern boost::random::mt19937 rng;
 
 const u64 playerID = 1;     // Entity with ID 1 is always the player.
 // how many tiles in every direction the player can see. TODO: improve this - add as component?
-#define FOV 25
+#define FOV 100

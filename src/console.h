@@ -11,6 +11,8 @@
 
 #include "common.h"
 
+// TODO: Add printing function! For strings!
+
 // Helper macros
 #define RED(c)   ((c & 0xff000000) >> 24)
 #define GREEN(c) ((c & 0x00ff0000) >> 16)
@@ -60,6 +62,7 @@ class Console {
 
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
+        void print(int x, int y, std::string text);
 
         bool dirty = true;
         u32 widthInChars;

@@ -34,6 +34,8 @@ boost::random::mt19937 rng;
 // NEXT TODO:
 // Build a GUI class that can handle multiple consoles/layers of various sizes.
 
+// IDEA: shared components!?! For components that can be the same for many entities, like the Physical component of walls. 
+// But will it be unnecessarily complicated? Maybe/probably... 
 
 /*
  * Build a cache for a level map, so that we don't need to iterate through a million entities each render loop.
@@ -116,17 +118,20 @@ int main(int argc, char *argv[])
 
     // Initialize console
     gui = std::make_unique<GUI>(SCREEN_WIDTH, SCREEN_HEIGHT);
-    gui->addLayer(rootLayer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png", 0);
-    gui->addLayer(mapLayer,  10, 10, 800, 480, "res/fonts/terminal16x16.png", 1);
+    gui->addLayer(rootLayer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
+    gui->addLayer(mapLayer,  16, 16, 800, 480, "res/fonts/terminal16x16.png");
 
-    mapConsole = gui->getLayer(mapLayer)->console;
+    mapConsole = layer(mapLayer)->console;
+    //layer(rootLayer)->console->put(65, 20, '*', 0xFF0000FF);
+    layer(rootLayer)->addStaticText(0, 63, 21, "A S D C");
+    // TODO: Define handles for gui components
 
     // Initialize random number generator
     seed = time(0);
     rng.seed(seed);
 
     // create player and the world (only one level for now)
-    ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(20, 20))->assign(Renderable('@', 0x0055AAFF));
+    ecs::createEntity(playerID)->assign(Position(20, 20))->assign(Renderable('@', 0x0055AAFF));
     //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
     
     world = std::make_unique<World>();
