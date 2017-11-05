@@ -5,8 +5,9 @@
  */
 
 #include "ui.h"
+#include "input.h"
 
-// TODO: Add layer blending?
+// TODO: Add layer blending?!
 
 std::vector<std::pair<int, Layer*>> RenderOrderDetail;
 
@@ -24,10 +25,10 @@ Layer* GUI::getLayer(const int handle)
     return &(finder->second);
 }
 
-void GUI::addLayer(const int handle, const int X, const int Y, const int W, const int H, std::string font, int order)
+void GUI::addLayer(const int handle, const int X, const int Y, const int W, const int H, std::string font, const int fontW, const int fontH, int order)
 {
     checkHandleUniqueness(handle);
-    layers.emplace(std::make_pair(handle, Layer(X, Y, W, H, font)));
+    layers.emplace(std::make_pair(handle, Layer(X, Y, W, H, font, fontW, fontH)));
     if(order == -1) {
         order = renderOrder;
         ++renderOrder;
@@ -44,16 +45,49 @@ void GUI::addLayer(const int handle, const int X, const int Y, const int W, cons
 
 void Layer::render(sf::RenderWindow &window)
 {
-    if (!controls.empty()) {
-        for (auto it = controls.begin(); it != controls.end(); ++it) {
-            it->second->render(console);
-        }
-    }
+    if (console) {
+        // Render GUI Controls
+        if (!controls.empty()) {
+            // Render start events
+            for (auto it = controls.begin(); it != controls.end(); ++it) {
+                if (it->second->onRenderStart) {
+                    auto callfunc = it->second->onRenderStart;
+                    callfunc(it->second.get());
+                }
 
-    console->render(window);
+                // Add mouse stuff here
+                int mx, my;
+                std::tie(mx, my) = getMousePosition();
+
+                if (mx >= x && mx <= (x+w) && my >= y && my <= (y+h)) {
+                    const int termx = (mx - x) / fontWidth;
+                    const int termy = (my - y) / fontHeight;
+                    // Mouse over is possible
+                    if (it->second->mouseInsideControl(termx, termy)) {
+                        // If inside control, and has onMouseOver callback - call that
+                        if(it->second->onMouseOver) {
+                            auto callfunc = it->second->onMouseOver;
+                            callfunc(it->second.get(), termx, termy);
+                        }
+                        // TODO: Add mouse button handling
+                    }
+                }
+
+                // Render the control
+                it->second->render(console);
+            }
+        }
+
+        // Render the console
+        console->render(window);
+    }
 }
 
 void GuiStaticText::render(std::shared_ptr<Console> console)
 {
-    console->print(x, y, text);
+    console->print(x, y, text, fgColor);
+}
+
+void GuiStaticText::handleMouseOver(GuiControl *ctrl, int termx, int termy)
+{
 }

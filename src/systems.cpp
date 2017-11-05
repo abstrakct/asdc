@@ -50,22 +50,12 @@ void CameraSystem::update(const double durationMS)
 
         // draw everything to screen.
         window.clear(sf::Color::Black);
+        // TODO: separate GUI and game loop! right now, gui only updates when player moves/presses a key
         gui->render(window);
         
-        //mapConsole->render(window, startx, starty, endx, endy);
-        //sf::Sprite s;
-        //s.setTexture(tex.getTexture());
-        //window.draw(s);
-        //window.display();
-
         mapConsole->dirty = false;
 
         // Question: is it quicker to draw pixels myself instead of sprites/textures? Probably not?
-        //sf::Uint8 *pixels = console->getPixels();
-        //tex.update(pixels);
-        //window.draw(sprite); 
-        // tex.loadfrommemory?
-        //tex.update(console->getPixels());
     }
     //u32 end = SDL_GetTicks();
     //std::cout << "CameraSystem::update took " << (end - start) << " ms to complete." << std::endl;

@@ -63,6 +63,7 @@ class Console {
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
         void print(int x, int y, std::string text);
+        void print(int x, int y, std::string text, u32 fgColor);
 
         bool dirty = true;
         u32 widthInChars;

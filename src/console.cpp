@@ -175,6 +175,15 @@ void Console::print(int x, int y, std::string text)
     }
 }
 
+void Console::print(int x, int y, std::string text, u32 fgColor)
+{
+    // TODO: ERROR checking etc!
+    for (auto c : text) {
+        put(x, y, c, fgColor);
+        x++;
+    }
+}
+
 Rectangle Console::cellToRectangle(u32 x, u32 y)
 {
     Rectangle result;

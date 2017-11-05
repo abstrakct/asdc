@@ -17,9 +17,9 @@
 #include "systems.h"
 #include "messages.h"
 #include "world.h"
+#include "input.h"
 
 #define FPS_LIMIT      60
-
 
 sf::RenderWindow window;
 sf::RenderTexture tex;
@@ -87,6 +87,11 @@ void run(std::function<void(double)> on_tick)
                 done = true;
             if(event.type == sf::Event::KeyPressed)
                 ecs::emit(KeyPressed{event});
+            if(event.type == sf::Event::MouseMoved) {
+                setMousePosition(event.mouseMove.x, event.mouseMove.y);
+                // quick and dirty hack for now:
+                layer(mapLayer)->console->dirty = true;
+            }
         }
 
         //window.clear();
@@ -118,12 +123,13 @@ int main(int argc, char *argv[])
 
     // Initialize console
     gui = std::make_unique<GUI>(SCREEN_WIDTH, SCREEN_HEIGHT);
-    gui->addLayer(rootLayer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
-    gui->addLayer(mapLayer,  16, 16, 800, 480, "res/fonts/terminal16x16.png");
+    gui->addLayer(rootLayer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/Cheepicus_16x16.png", 16, 16);
+    gui->addLayer(mapLayer,  16, 16, 800, 480, "res/fonts/terminal16x16.png", 16, 16);
 
     mapConsole = layer(mapLayer)->console;
     //layer(rootLayer)->console->put(65, 20, '*', 0xFF0000FF);
-    layer(rootLayer)->addStaticText(0, 63, 21, "A S D C");
+    layer(rootLayer)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
+    layer(rootLayer)->addStaticText(1, 63, 22, "greentext", 0x00ff00ff);
     // TODO: Define handles for gui components
 
     // Initialize random number generator
@@ -131,7 +137,7 @@ int main(int argc, char *argv[])
     rng.seed(seed);
 
     // create player and the world (only one level for now)
-    ecs::createEntity(playerID)->assign(Position(20, 20))->assign(Renderable('@', 0x0055AAFF));
+    ecs::createEntity(playerID)->assign(Position(5, 5))->assign(Renderable('@', 0x0055AAFF));
     //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
     
     world = std::make_unique<World>();
