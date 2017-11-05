@@ -14,13 +14,16 @@
 #include "common.h"
 #include "utils.h"
 
-extern sf::RenderWindow window;
+//extern sf::RenderWindow window;
 extern sf::RenderTexture tex;
 
-Console::Console(u32 w, u32 h)
+Console::Console(int xO, int yO, u32 w, u32 h)
 {
     widthInPixels = w;
     heightInPixels = h;
+    xOffset = xO;
+    yOffset = yO;
+    tex.create(w, h);
 }
 
 //Console::Console(u32 w, u32 h, std::string font)
@@ -111,6 +114,7 @@ void Console::clear()
 
 void Console::render(sf::RenderWindow &window)
 {
+    tex.clear(sf::Color::Black);
     // Go through cells, render all to pixels
     for (u32 x = 0; x < widthInChars; x++) {
         for (u32 y = 0; y < heightInChars; y++) {
@@ -118,15 +122,20 @@ void Console::render(sf::RenderWindow &window)
             if(c) {
                 fontSprite[c].setPosition(x*fontCharWidth, y*fontCharHeight);
                 fontSprite[c].setColor(cell[x][y].fgColor);
-                window.draw(fontSprite[c]);
+                tex.draw(fontSprite[c]);
             }
         }
     }
+
+    tex.display();
+    sf::Sprite compositor(tex.getTexture());
+    compositor.move(xOffset, yOffset);
+    window.draw(compositor);
 }
 
 void Console::render(sf::RenderWindow &window, u32 startx, u32 starty, u32 endx, u32 endy)
 {
-    // Go through cells, render all to pixels
+    // Go through subset of cells, render all to pixels
     for (u32 x = startx; x <= endx; x++) {
         for (u32 y = starty; y <= endy; y++) {
             unsigned char c = cell[x][y].c;

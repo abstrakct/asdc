@@ -11,6 +11,7 @@
 #include "console.h"
 
 extern std::unique_ptr<GUI> gui;
+extern std::shared_ptr<Console> mapConsole;
 
 struct ActorMovementSystem : public ecs::BaseSystem {
     virtual void configure() override {
@@ -32,7 +33,7 @@ struct PlayerSystem : public ecs::BaseSystem {
     virtual void configure() override {
         systemName = "Player System";
         subscribe<ActorMovedMessage>([](ActorMovedMessage &msg) {
-                gui->getLayer(0)->console->dirty = true;
+                mapConsole->dirty = true;
                 emit(PlayerMovedMessage{});
                 });
         subscribe_mbox<KeyPressed>();

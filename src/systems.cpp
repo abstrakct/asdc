@@ -10,23 +10,23 @@
 #include "console.h"
 #include "ui.h"
 
-#define con gui->getLayer(0)->console
 extern std::unique_ptr<GUI> gui;
 extern std::unique_ptr<World> world;
+extern std::shared_ptr<Console> mapConsole;
 
 extern sf::RenderWindow window;
 extern sf::RenderTexture tex;
 
-// TODO: rendering is still too slow! Look into optimizations!
+// PROBABLY RESOLVED_TODO: rendering is still too slow! Look into optimizations!
 
 void CameraSystem::update(const double durationMS)
 {
     //u32 start = SDL_GetTicks();
-    if(con->dirty) {
+    if(mapConsole->dirty) {
         Position *pos = ecs::entity(playerID)->component<Position>();
         Renderable *r = ecs::entity(playerID)->component<Renderable>();
 
-        con->clear();
+        mapConsole->clear();
 
         i32 startx = (pos->x - FOV);
         u32 endx   = (pos->x + FOV);
@@ -41,24 +41,24 @@ void CameraSystem::update(const double durationMS)
         for (i32 x = startx; x <= (i32)endx; x++) {
             for (i32 y = starty; y <= (i32)endy; y++) {
                 if(world->currentLevel->cache[x][y].type != cellUnused)
-                    con->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fgColor);
+                    mapConsole->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fgColor);
             }
         }
 
         // put player
-        con->put(pos->x, pos->y, r->glyph, r->fgColor);
+        mapConsole->put(pos->x, pos->y, r->glyph, r->fgColor);
 
         // draw everything to screen.
         window.clear(sf::Color::Black);
         gui->render(window);
         
-        //con->render(window, startx, starty, endx, endy);
+        //mapConsole->render(window, startx, starty, endx, endy);
         //sf::Sprite s;
         //s.setTexture(tex.getTexture());
         //window.draw(s);
         //window.display();
 
-        con->dirty = false;
+        mapConsole->dirty = false;
 
         // Question: is it quicker to draw pixels myself instead of sprites/textures? Probably not?
         //sf::Uint8 *pixels = console->getPixels();

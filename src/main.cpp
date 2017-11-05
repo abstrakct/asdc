@@ -26,6 +26,7 @@ sf::RenderTexture tex;
 
 std::unique_ptr<GUI> gui;
 std::unique_ptr<World> world;
+std::shared_ptr<Console> mapConsole;         // pass as parameter instead of global variable? TODO
 
 long seed;
 boost::random::mt19937 rng;
@@ -115,21 +116,21 @@ int main(int argc, char *argv[])
 
     // Initialize console
     gui = std::make_unique<GUI>(SCREEN_WIDTH, SCREEN_HEIGHT);
-    gui->addLayer(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
-    gui->addLayer(1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png");
+    gui->addLayer(rootLayer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/terminal16x16.png", 0);
+    gui->addLayer(mapLayer,  10, 10, 800, 480, "res/fonts/terminal16x16.png", 1);
 
+    mapConsole = gui->getLayer(mapLayer)->console;
 
     // Initialize random number generator
     seed = time(0);
     rng.seed(seed);
-
 
     // create player and the world (only one level for now)
     ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(20, 20))->assign(Renderable('@', 0x0055AAFF));
     //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
     
     world = std::make_unique<World>();
-    world->addLevel("Dungeon Level 1", 40, 40);
+    world->addLevel("Dungeon Level 1", 50, 30);
     world->setCurrentLevel("Dungeon Level 1");
     world->generate();
     buildMapCache(world->currentLevel);

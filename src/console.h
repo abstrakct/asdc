@@ -40,11 +40,13 @@ class Console {
         sf::Texture fontTexture;
         sf::Sprite fontSprite[256];
         Cell cell[256][256];            // TODO: remove hard coded max values
+        sf::RenderTexture tex;
+        int xOffset, yOffset;
 
         sf::IntRect rectForGlyph(unsigned char c);
         void createSprites();
     public:
-        Console(u32 w, u32 h);
+        Console(int xO, int yO, u32 w, u32 h);
         //Console(u32 w, u32 h, std::string font);
         ~Console();
 

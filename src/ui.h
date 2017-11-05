@@ -14,6 +14,9 @@
 #include "common.h"
 #include "console.h"
 
+#define rootLayer 0
+#define mapLayer  1
+#define testLayer 2
 
 struct KeyPressed {
     KeyPressed() {}
@@ -24,14 +27,14 @@ struct KeyPressed {
 struct Layer {
     Layer(const int X, const int Y, const int W, const int H, std::string fontName) :
         x(X), y(Y), w(W), h(H), font(fontName) {
-            console = std::make_unique<Console>(W, H);
+            console = std::make_shared<Console>(X, Y, W, H);
             console->setFont(fontName, 16, 16, 256, 256);  // TODO: remove hard coded values!
         }
 
     void render(sf::RenderWindow &window);
     int x, y, w, h;
     std::string font;
-    std::unique_ptr<Console> console;
+    std::shared_ptr<Console> console;
 };
 
 // TODO: add controls, rendering order
