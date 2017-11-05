@@ -1,7 +1,7 @@
 /*
  * ecs.cpp
  *
- * some inspiration taken from RLTK (github.com/thebracket) - see notes here and there!
+ * Pretty much all of the ECS was taken from RLTK (github.com/thebracket) - Huge thanks!
  */
 
 #include <vector>

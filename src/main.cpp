@@ -125,16 +125,14 @@ int main(int argc, char *argv[])
 
 
     // create player and the world (only one level for now)
-    ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(10, 10))->assign(Renderable('@', 0x0055AAFF));
+    ecs::Entity *player = ecs::createEntity(playerID)->assign(Position(20, 20))->assign(Renderable('@', 0x0055AAFF));
     //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
     
     world = std::make_unique<World>();
-    world->addLevel("Dungeon Level 1", 80, 80);
+    world->addLevel("Dungeon Level 1", 40, 40);
     world->setCurrentLevel("Dungeon Level 1");
     world->generate();
     buildMapCache(world->currentLevel);
-
-    gui->getLayer(1)->console->put(15, 10, '$');
 
     // add and configure systems
     ecs::addSystem<PlayerSystem>();

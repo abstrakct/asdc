@@ -1,9 +1,10 @@
-set makeprg=make\ debug\ -j8
+set makeprg=make\ -j8
 nmap <F5> :wa<CR>:cd ..<CR>:make!<CR>:cd src<CR>
 imap <F5> <ESC>:wa<CR>:cd ..<CR>:make!<CR>:cd src<CR>
-nmap <F6> :wa<CR>:cd ..<CR>:make!<CR>:!./asdc<CR>:cd src<CR>
-imap <F6> <ESC>:wa<CR>:cd ..<CR>:make!<CR>:!./asdc<CR>:cd src<CR>
-nmap <F7> :!../asdc<CR>
+nmap <F6> :wa<CR>:cd ..<CR>:make! debug<CR>:!./asdc<CR>:cd src<CR>
+imap <F6> <ESC>:wa<CR>:cd ..<CR>:make! debug<CR>:!./asdc<CR>:cd src<CR>
+nmap <F7> :wa<CR>:cd ..<CR>:make! release<CR>:!./asdc<CR>:cd src<CR>
+imap <F7> <ESC>:wa<CR>:cd ..<CR>:make! release<CR>:!./asdc<CR>:cd src<CR>
 nmap <F8> :YcmCompleter FixIt<CR>
 nmap <F9> :YcmCompleter GetType<CR>
 nmap <F10> :wa<CR>:cd ..<CR>:!nemiver ./asdc<CR>:cd src<CR>
