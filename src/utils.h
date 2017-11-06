@@ -1,3 +1,8 @@
+/*
+ * utils.h
+ *
+ * Various useful things, like easy access to random numbers in various ways.
+ */
 #pragma once
 
 #include <string>
@@ -16,7 +21,5 @@ int roll_die();
 
 u32 PT_ColorizePixel(u32 dest, u32 src);
 
-std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int y1);
-std::vector<std::pair<int, int>> getLineCoordinatesBresenham(int x0, int y0, int x1, int y1);
 
 // vim: fdm=syntax ft=cpp

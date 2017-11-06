@@ -9,7 +9,7 @@
 #include "systems.h"
 #include "console.h"
 #include "ui.h"
-#include "utils.h"
+#include "fov.h"
 
 extern std::unique_ptr<GUI> gui;
 extern std::unique_ptr<World> world;
@@ -64,67 +64,6 @@ void CameraSystem::update(const double durationMS)
     }
     //u32 end = SDL_GetTicks();
     //std::cout << "CameraSystem::update took " << (end - start) << " ms to complete." << std::endl;
-}
-
-void castRay(std::vector<std::pair<int, int>> line)
-{
-    std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
-    bool vis  = true;
-    // Iterate through all points in line.
-    for (auto it : line) {
-        int tx, ty;
-        std::tie(tx, ty) = it;
-        if(tx < 0) break;
-        if(ty < 0) break;
-        if (!world->currentLevel->cache[tx][ty].blocksLight) {
-            fovMap[tx][ty] = vis;
-        } else {
-            // If a cell blocks light, set that cell to visible
-            fovMap[tx][ty] = vis;
-            // But further cells on that line will be set to invisible, regardless of whether they block light or not.
-            vis = false;
-        }
-    }
-}
-
-void myRayCastingFOVAlgorithm()
-{
-    const int fov = ecs::entity(playerID)->component<Vision>()->fovRadius; 
-    const Position *pos = ecs::entity(playerID)->component<Position>();
-    std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
-
-    // Algorithm for FOV:
-    // Clear FOVmap
-    // Draw lines to each point on the edge of FOV
-    // Walk each line, mark each point as visible if it doesn't block light.
-    // If we come across something that blocks light, mark it as visible, and the rest of the line as invisible.
-
-    // clear FOV
-    fovMap = {};
-
-    const int startx = pos->x;
-    const int starty = pos->y;
-    for (int endx = (startx - fov); endx <= (startx + fov); endx++) {
-        // Find endpoint
-        int endy = starty - fov;
-        // Draw the line and cast the ray
-        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
-    } // end of first x loop
-
-    for (int endy = (starty - fov); endy <= (starty + fov); endy++) {
-        int endx = startx + fov;
-        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
-    } // end of first y loop
-
-    for (int endx = (startx + fov); endx >= (startx - fov); endx--) {
-        int endy = starty + fov;
-        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
-    } // end of second x loop
-
-    for (int endy = (starty + fov); endy >= (starty - fov); endy--) {
-        int endx = startx - fov;
-        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
-    } // end of second y loop
 }
 
 

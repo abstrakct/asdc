@@ -125,9 +125,6 @@ void initSFML()
 
 int main(int argc, char *argv[])
 {
-    std::vector<std::pair<int, int>> line;
-    line = getLineCoordinates(5, 5, 5, 15);
-
     initSFML();
 
     // Initialize console

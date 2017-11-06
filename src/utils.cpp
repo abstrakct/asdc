@@ -1,5 +1,7 @@
 /* 
- * Various utility functions
+ * utils.h
+ *
+ * Various useful things and utility functions, like easy access to random numbers in various ways.
  */
 
 #include <stdlib.h>
@@ -80,94 +82,6 @@ u32 PT_ColorizePixel(u32 dest, u32 src)
     } else {
         return dest;
     }
-}
-
-int myabs(int n)
-{
-    return ( (n > 0) ? n : (n * (-1)));
-}
-
-// Draw a line from x0,y0 to x1,y1
-// Return vector of int pairs, each pair contains one coordinate on the line.
-// DDA algorithm, based on https://www.tutorialspoint.com/computer_graphics/line_generation_algorithm.htm
-// and http://www.geeksforgeeks.org/dda-line-generation-algorithm-computer-graphics/
-std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int y1)
-{
-    std::vector<std::pair<int, int>> line;
-
-    float x = x0;
-    float y = y0;
-    int dx = x1 - x0;
-    int dy = y1 - y0;
-    int steps;
-    if(myabs(dx) > myabs(dy))
-        steps = myabs(dx);
-    else
-        steps = myabs(dy);
-
-    float xinc = dx / (float) steps;
-    float yinc = dy / (float) steps;
-
-    // Add first point (needed?)
-   // line.push_back(std::make_pair(static_cast<int>(x), static_cast<int>(y)));
-    // Add the rest
-    for (int i = 0; i <= steps; i++) {
-        x += xinc;
-        y += yinc;
-        line.push_back(std::make_pair(static_cast<int>(x), static_cast<int>(y)));
-    }
-
-    return line;
-}
-
-// Bresenham algorithm, based on http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#C.2B.2B
-std::vector<std::pair<int, int>> getLineCoordinatesBresenham(int x0, int y0, int x1, int y1)
-{
-    std::vector<std::pair<int, int>> line;
-
-    int deltax = x1 - x0;
-    int deltay = y1 - y0;
-    int x = x0;
-    int y = y0;
-
-    signed char const ix((deltax > 0) - (deltax < 0));
-    deltax = std::abs(deltax) << 1;
-
-    signed char const iy((deltay > 0) - (deltay < 0));
-    deltay = std::abs(deltay) << 1;
-
-    line.push_back(std::make_pair(x, y));
-
-    //float deltaerr = abs(deltay / deltax);
-    //float error = 0.0;
-
-    if (deltax >= deltay) {
-        int error = deltay - (deltax >> 1);
-        while (x0 != x1) {
-            if ((error > 0) || (!error && (ix > 0))) {
-                error -= deltax;
-                y0 += iy;
-            }
-
-            error += deltay;
-            x0 += ix;
-            line.push_back(std::make_pair(x0, y0));
-        }
-    } else {
-        int error = (deltax - (deltay >> 1));
-        while (y0 != y1) {
-            if ((error > 0) || (!error && (iy > 0))) {
-                error -= deltay;
-                x0 += ix;
-            }
-
-            error += deltax;
-            y0 += iy;
-            line.push_back(std::make_pair(x0, y0));
-        }
-    }
-
-    return line;
 }
 
 
