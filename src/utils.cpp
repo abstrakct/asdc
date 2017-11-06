@@ -18,7 +18,7 @@ using namespace std;
 
 u64 ri(u64 a, u64 b) 
 {
-    boost::random::uniform_int_distribution<> dist(a, b);
+    std::uniform_int_distribution<int> dist(a, b);
     return dist(rng);
 }
 
@@ -26,7 +26,7 @@ bool fiftyfifty()
 {
     u64 i;
 
-    boost::random::uniform_int_distribution<> dist(1, 100);
+    std::uniform_int_distribution<> dist(1, 100);
     i = dist(rng);
 
     if(i <= 50)
@@ -39,7 +39,7 @@ bool x_in_y(u64 x, u64 y)
 {
     u64 i;
 
-    boost::random::uniform_int_distribution<> dist(1, y);
+    std::uniform_int_distribution<> dist(1, y);
     i = dist(rng);
 
     if(i <= x)
@@ -54,8 +54,7 @@ bool one_in(int chance)
 }
 
 int roll_die() {
-    boost::random::uniform_int_distribution<> dist(1, 6);
-    return dist(rng);
+    return ri(1, 6);
 }
 
 int dice(int num, int sides, signed int modifier) {
@@ -63,7 +62,7 @@ int dice(int num, int sides, signed int modifier) {
 
     min = num;
     max = num * sides;
-    boost::random::uniform_int_distribution<> dist(min, max);
+    std::uniform_int_distribution<> dist(min, max);
     return (dist(rng) + modifier);
 }
 

@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <memory>
+#include <random>
 
 #include "common.h"
 #include "ecs.h"
@@ -29,8 +30,8 @@ std::unique_ptr<GUI> gui;
 std::unique_ptr<World> world;
 std::shared_ptr<Console> mapConsole;         // pass as parameter instead of global variable? TODO
 
-long seed;
-boost::random::mt19937 rng;
+u64 seed;
+std::mt19937 rng;
 
 // NEXT TODO:
 // Build a GUI class that can handle multiple consoles/layers of various sizes.
@@ -138,7 +139,8 @@ int main(int argc, char *argv[])
     layer(rootLayer)->addStaticText(1, 63, 22, "greentext", 0x00ff00ff);
     // TODO: Define handles for gui components
 
-    // Initialize random number generator
+    // Initialize random number generator.
+    // Seed is the current time.
     seed = time(0);
     rng.seed(seed);
 

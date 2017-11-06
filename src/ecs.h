@@ -12,6 +12,7 @@
 #include <queue>
 #include <functional>
 #include <mutex>
+#include <algorithm>
 
 #include "common.h"
 

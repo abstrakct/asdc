@@ -25,7 +25,7 @@ INCLUDES = -I $(SRC_PATH)/ -I $(SRC_PATH)/../include -I $(SRC_PATH)/../lib
 #LINK_FLAGS = -lboost_program_options -lboost_random -lm -ltcodxx -lSDL -lSDL2_mixer `pkg-config --libs libconfig++` -Llib -Wl,-rpath=lib
 #LINK_FLAGS = -ljsoncpp -lboost_program_options -lboost_random -lboost_serialization -lm -ltcodxx -Llib -Wl,-rpath=lib `sdl2-config --cflags --libs`
 #LINK_FLAGS = -lboost_random -Llib -Wl,-rpath=lib `sdl2-config --cflags --libs`
-LINK_FLAGS = -lboost_random -Llib -Wl,-rpath=lib -lsfml-graphics -lsfml-window -lsfml-system
+LINK_FLAGS = -Llib -Wl,-rpath=lib -lsfml-graphics -lsfml-window -lsfml-system
 # Additional release-specific linker settings
 RLINK_FLAGS = 
 # Additional debug-specific linker settings
