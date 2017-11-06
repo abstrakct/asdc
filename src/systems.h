@@ -16,14 +16,14 @@ extern std::shared_ptr<Console> mapConsole;
 struct ActorMovementSystem : public ecs::BaseSystem {
     virtual void configure() override {
         systemName = "Actor Movement System";
-        subscribe<ActorMovedMessage>([](ActorMovedMessage &msg) {
+        /*subscribe<ActorMovedMessage>([](ActorMovedMessage &msg) {
                 u32 newx = msg.actor->component<Position>()->x + msg.dx;
                 u32 newy = msg.actor->component<Position>()->y + msg.dy;
                 if (!positionBlocksMovement(newx, newy)) {
                     msg.actor->component<Position>()->x = newx;
                     msg.actor->component<Position>()->y = newy;
                 }
-                });
+                });*/
     }
     virtual void update(const double durationMS) override {
     }
@@ -33,8 +33,14 @@ struct PlayerSystem : public ecs::BaseSystem {
     virtual void configure() override {
         systemName = "Player System";
         subscribe<ActorMovedMessage>([](ActorMovedMessage &msg) {
-                mapConsole->dirty = true;
-                emit(PlayerMovedMessage{});
+                u32 newx = msg.actor->component<Position>()->x + msg.dx;
+                u32 newy = msg.actor->component<Position>()->y + msg.dy;
+                if (!positionBlocksMovement(newx, newy)) {
+                    msg.actor->component<Position>()->x = newx;
+                    msg.actor->component<Position>()->y = newy;
+                    mapConsole->dirty = true;
+                    emit(PlayerMovedMessage{});
+                    }
                 });
         subscribe_mbox<KeyPressed>();
     }

@@ -109,7 +109,7 @@ std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int 
     float yinc = dy / (float) steps;
 
     // Add first point (needed?)
-    line.push_back(std::make_pair(static_cast<int>(x), static_cast<int>(y)));
+   // line.push_back(std::make_pair(static_cast<int>(x), static_cast<int>(y)));
     // Add the rest
     for (int i = 0; i <= steps; i++) {
         x += xinc;

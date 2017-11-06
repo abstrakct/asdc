@@ -66,6 +66,8 @@ void CameraSystem::update(const double durationMS)
     //std::cout << "CameraSystem::update took " << (end - start) << " ms to complete." << std::endl;
 }
 
+// TODO: I don't think the FOV update triggers correctly! It seems to calculate FOV from player's previous position!
+// TODO: improve CameraSystem!
 void VisibilitySystem::configure()
 {
         systemName = "Visibility System";
@@ -182,9 +184,7 @@ void VisibilitySystem::configure()
 void VisibilitySystem::update(const double durationMS)
 {
     if(firstRun) {
-        // Add stuff here that we need for the first run, if any 
-
-        ecs::emit(PlayerMovedMessage{});
+        //ecs::emit(PlayerMovedMessage{});
         firstRun = false;
     }
 }
