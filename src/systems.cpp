@@ -107,33 +107,27 @@ void myRayCastingFOVAlgorithm()
     for (int endx = (startx - fov); endx <= (startx + fov); endx++) {
         // Find endpoint
         int endy = starty - fov;
-        // Draw the line
-        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-        // Cast the ray
-        castRay(line);
+        // Draw the line and cast the ray
+        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
     } // end of first x loop
 
     for (int endy = (starty - fov); endy <= (starty + fov); endy++) {
         int endx = startx + fov;
-        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-        castRay(line);
+        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
     } // end of first y loop
 
     for (int endx = (startx + fov); endx >= (startx - fov); endx--) {
         int endy = starty + fov;
-        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-        castRay(line);
+        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
     } // end of second x loop
 
     for (int endy = (starty + fov); endy >= (starty - fov); endy--) {
         int endx = startx - fov;
-        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-        castRay(line);
+        castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
     } // end of second y loop
 }
 
 
-// TODO: I don't think the FOV update triggers correctly! It seems to calculate FOV from player's previous position!
 // TODO: improve CameraSystem!
 // TODO: Move to a different file!
 void VisibilitySystem::configure()
