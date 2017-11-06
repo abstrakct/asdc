@@ -91,7 +91,7 @@ void VisibilitySystem::configure()
                     // Find endpoint
                     int endy = starty - fov;
                     // Draw the line
-                    std::vector<std::pair<int, int>> line = getLineCoordinates(startx, starty, endx, endy);
+                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
 
                     // TODO: move "line walking" to separate function? inline?
                     
@@ -115,7 +115,7 @@ void VisibilitySystem::configure()
 
                 for (int endy = (starty - fov); endy <= (starty + fov); endy++) {
                     int endx = startx + fov;
-                    std::vector<std::pair<int, int>> line = getLineCoordinates(startx, starty, endx, endy);
+                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
                     bool vis  = true;
                     // Iterate through all points in line.
                     for (auto it : line) {
@@ -136,7 +136,7 @@ void VisibilitySystem::configure()
 
                 for (int endx = (startx + fov); endx >= (startx - fov); endx--) {
                     int endy = starty + fov;
-                    std::vector<std::pair<int, int>> line = getLineCoordinates(startx, starty, endx, endy);
+                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
                     bool vis  = true;
                     // Iterate through all points in line.
                     for (auto it : line) {
@@ -159,7 +159,7 @@ void VisibilitySystem::configure()
                     // Find endpoint
                     int endx = startx - fov;
                     // Draw the line
-                    std::vector<std::pair<int, int>> line = getLineCoordinates(startx, starty, endx, endy);
+                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
                     bool vis  = true;
                     // Iterate through all points in line.
                     for (auto it : line) {

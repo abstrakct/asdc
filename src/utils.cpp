@@ -120,29 +120,65 @@ std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int 
     return line;
 }
 
-// Not working, unfinished implementation based on wikipedia article on Bresenham's line algorithm:
-std::vector<std::pair<int, int>> getLineCoordinatesBresenhamNOTWORKINGORFINISHED(int x0, int y0, int x1, int y1)
+// Bresenham algorithm, based on http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#C.2B.2B
+std::vector<std::pair<int, int>> getLineCoordinatesBresenham(int x0, int y0, int x1, int y1)
 {
     std::vector<std::pair<int, int>> line;
 
-    float deltax = x1 - x0;
-    float deltay = y1 - y0;
-    float deltaerr = abs(deltay / deltax);
-    float error = 0.0;
+    int deltax = x1 - x0;
+    int deltay = y1 - y0;
+    int x = x0;
+    int y = y0;
 
-    int y =  y0;
-    for (int x = x0; x <= x1; x++) {
-        line.push_back(std::make_pair(x, y));
-        error += deltaerr;
-        while (error >= 0.5) {
-            if (deltay < 0)
-                y -= 1;
-            else
-                y += 1;
+    signed char const ix((deltax > 0) - (deltax < 0));
+    deltax = std::abs(deltax) << 1;
+
+    signed char const iy((deltay > 0) - (deltay < 0));
+    deltay = std::abs(deltay) << 1;
+
+    line.push_back(std::make_pair(x, y));
+
+    //float deltaerr = abs(deltay / deltax);
+    //float error = 0.0;
+
+    if (deltax >= deltay) {
+        int error = deltay - (deltax >> 1);
+        while (x0 != x1) {
+            if ((error > 0) || (!error && (ix > 0))) {
+                error -= deltax;
+                y0 += iy;
+            }
+
+            error += deltay;
+            x0 += ix;
+            line.push_back(std::make_pair(x0, y0));
+        }
+    } else {
+        int error = (deltax - (deltay >> 1));
+        while (y0 != y1) {
+            if ((error > 0) || (!error && (iy > 0))) {
+                error -= deltay;
+                x0 += ix;
+            }
+
+            error += deltax;
+            y0 += iy;
+            line.push_back(std::make_pair(x0, y0));
         }
     }
 
     return line;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // vim: fdm=syntax ft=cpp
