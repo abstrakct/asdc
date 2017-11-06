@@ -66,125 +66,88 @@ void CameraSystem::update(const double durationMS)
     //std::cout << "CameraSystem::update took " << (end - start) << " ms to complete." << std::endl;
 }
 
+void castRay(std::vector<std::pair<int, int>> line)
+{
+    std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
+    bool vis  = true;
+    // Iterate through all points in line.
+    for (auto it : line) {
+        int tx, ty;
+        std::tie(tx, ty) = it;
+        if(tx < 0) break;
+        if(ty < 0) break;
+        if (!world->currentLevel->cache[tx][ty].blocksLight) {
+            fovMap[tx][ty] = vis;
+        } else {
+            // If a cell blocks light, set that cell to visible
+            fovMap[tx][ty] = vis;
+            // But further cells on that line will be set to invisible, regardless of whether they block light or not.
+            vis = false;
+        }
+    }
+}
+
+void myRayCastingFOVAlgorithm()
+{
+    const int fov = ecs::entity(playerID)->component<Vision>()->fovRadius; 
+    const Position *pos = ecs::entity(playerID)->component<Position>();
+    std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
+
+    // Algorithm for FOV:
+    // Clear FOVmap
+    // Draw lines to each point on the edge of FOV
+    // Walk each line, mark each point as visible if it doesn't block light.
+    // If we come across something that blocks light, mark it as visible, and the rest of the line as invisible.
+
+    // clear FOV
+    fovMap = {};
+
+    const int startx = pos->x;
+    const int starty = pos->y;
+    for (int endx = (startx - fov); endx <= (startx + fov); endx++) {
+        // Find endpoint
+        int endy = starty - fov;
+        // Draw the line
+        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
+        // Cast the ray
+        castRay(line);
+    } // end of first x loop
+
+    for (int endy = (starty - fov); endy <= (starty + fov); endy++) {
+        int endx = startx + fov;
+        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
+        castRay(line);
+    } // end of first y loop
+
+    for (int endx = (startx + fov); endx >= (startx - fov); endx--) {
+        int endy = starty + fov;
+        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
+        castRay(line);
+    } // end of second x loop
+
+    for (int endy = (starty + fov); endy >= (starty - fov); endy--) {
+        int endx = startx - fov;
+        std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
+        castRay(line);
+    } // end of second y loop
+}
+
+
 // TODO: I don't think the FOV update triggers correctly! It seems to calculate FOV from player's previous position!
 // TODO: improve CameraSystem!
+// TODO: Move to a different file!
 void VisibilitySystem::configure()
 {
         systemName = "Visibility System";
         subscribe<PlayerMovedMessage>([](PlayerMovedMessage &msg) {
-                const int fov = ecs::entity(playerID)->component<Vision>()->fovRadius; 
-                const Position *pos = ecs::entity(playerID)->component<Position>();
-                std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
-
-                // Algorithm for FOV:
-                // Clear FOVmap
-                // Draw lines to each point on the edge of FOV
-                // Walk each line, mark each point as visible if it doesn't block light.
-                // If we come across something that blocks light, mark it as visible, and the rest of the line as invisible.
-
-                // clear FOV
-                fovMap = {};
-
-                const int startx = pos->x;
-                const int starty = pos->y;
-                for (int endx = (startx - fov); endx <= (startx + fov); endx++) {
-                    // Find endpoint
-                    int endy = starty - fov;
-                    // Draw the line
-                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-
-                    // TODO: move "line walking" to separate function? inline?
-                    
-                    bool vis  = true;
-                    // Iterate through all points in line.
-                    for (auto it : line) {
-                        int tx, ty;
-                        std::tie(tx, ty) = it;
-                        if(tx < 0) break;
-                        if(ty < 0) break;
-                        if (!world->currentLevel->cache[tx][ty].blocksLight) {
-                            fovMap[tx][ty] = vis;
-                        } else {
-                            // If a cell blocks light, set that cell to visible
-                            fovMap[tx][ty] = vis;
-                            // But further cells on that line will be set to invisible, regardless of whether they block light or not.
-                            vis = false;
-                        }
-                    }
-                } // end of first x loop
-
-                for (int endy = (starty - fov); endy <= (starty + fov); endy++) {
-                    int endx = startx + fov;
-                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-                    bool vis  = true;
-                    // Iterate through all points in line.
-                    for (auto it : line) {
-                        int tx, ty;
-                        std::tie(tx, ty) = it;
-                        if(tx < 0) break;
-                        if(ty < 0) break;
-                        if (!world->currentLevel->cache[tx][ty].blocksLight) {
-                            fovMap[tx][ty] = vis;
-                        } else {
-                            // If a cell blocks light, set that cell to visible
-                            fovMap[tx][ty] = vis;
-                            // But further cells on that line will be set to invisible, regardless of whether they block light or not.
-                            vis = false;
-                        }
-                    }
-                } // end of first y loop
-
-                for (int endx = (startx + fov); endx >= (startx - fov); endx--) {
-                    int endy = starty + fov;
-                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-                    bool vis  = true;
-                    // Iterate through all points in line.
-                    for (auto it : line) {
-                        int tx, ty;
-                        std::tie(tx, ty) = it;
-                        if(tx < 0) break;
-                        if(ty < 0) break;
-                        if (!world->currentLevel->cache[tx][ty].blocksLight) {
-                            fovMap[tx][ty] = vis;
-                        } else {
-                            // If a cell blocks light, set that cell to visible
-                            fovMap[tx][ty] = vis;
-                            // But further cells on that line will be set to invisible, regardless of whether they block light or not.
-                            vis = false;
-                        }
-                    }
-                } // end of second x loop
-
-                for (int endy = (starty + fov); endy >= (starty - fov); endy--) {
-                    // Find endpoint
-                    int endx = startx - fov;
-                    // Draw the line
-                    std::vector<std::pair<int, int>> line = getLineCoordinatesBresenham(startx, starty, endx, endy);
-                    bool vis  = true;
-                    // Iterate through all points in line.
-                    for (auto it : line) {
-                        int tx, ty;
-                        std::tie(tx, ty) = it;
-                        if(tx < 0) break;
-                        if(ty < 0) break;
-                        if (!world->currentLevel->cache[tx][ty].blocksLight) {
-                            fovMap[tx][ty] = vis;
-                        } else {
-                            // If a cell blocks light, set that cell to visible
-                            fovMap[tx][ty] = vis;
-                            // But further cells on that line will be set to invisible, regardless of whether they block light or not.
-                            vis = false;
-                        }
-                    }
-                } // end of second y loop
-
+                myRayCastingFOVAlgorithm();
                 });
 }
 
 void VisibilitySystem::update(const double durationMS)
 {
     if(firstRun) {
-        //ecs::emit(PlayerMovedMessage{});
+        ecs::emit(PlayerMovedMessage{});
         firstRun = false;
     }
 }
