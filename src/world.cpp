@@ -100,6 +100,7 @@ void World::addLevel(std::string levelName, u32 w, u32 h)
 /*
  * Look at all entities in a certain position,
  * return true if any blocks movement.
+ * TODO: move to cache!???!??!
  */
 bool positionBlocksMovement(u32 x, u32 y)
 {

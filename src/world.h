@@ -16,6 +16,7 @@ struct MapCacheCell {
     MapCellType type;
     unsigned char glyph;
     u32 fgColor;
+    bool blocksLight;
 };
 
 class Level {

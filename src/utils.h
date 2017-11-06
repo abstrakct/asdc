@@ -16,4 +16,6 @@ int roll_die();
 
 u32 PT_ColorizePixel(u32 dest, u32 src);
 
+std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int y1);
+
 // vim: fdm=syntax ft=cpp

@@ -66,3 +66,9 @@ struct CameraSystem : public ecs::BaseSystem {
 
     virtual void update(const double durationMS) override;
 };
+
+struct VisibilitySystem : public ecs::BaseSystem {
+    virtual void configure() override;
+    virtual void update(const double durationMS) override;
+    bool firstRun = true;
+};

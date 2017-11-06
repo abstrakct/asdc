@@ -18,6 +18,7 @@
 #include "messages.h"
 #include "world.h"
 #include "input.h"
+#include "utils.h"
 
 #define FPS_LIMIT      60
 
@@ -37,6 +38,9 @@ boost::random::mt19937 rng;
 // IDEA: shared components!?! For components that can be the same for many entities, like the Physical component of walls. 
 // But will it be unnecessarily complicated? Maybe/probably... 
 
+// IDEA: sub-consoles! useful? necessary? cool? check cogmind dev.
+//
+// TODO: look into regex! also, string formatting.
 /*
  * Build a cache for a level map, so that we don't need to iterate through a million entities each render loop.
  * Cache is a 2D array inside the Level class that gets allocated in the constructor.
@@ -55,10 +59,12 @@ void buildMapCache(std::shared_ptr<Level> level)
         Position *pos = it->component<Position>();
         Renderable *r = it->component<Renderable>();
         MapCell *cell = it->component<MapCell>();
+        Physicality *p= it->component<Physicality>();
         if(pos && r && cell) {
             tmp.type = cell->type;
             tmp.glyph = r->glyph;
             tmp.fgColor = r->fgColor;
+            tmp.blocksLight = p->blocksLight;
             level->cache[pos->x][pos->y] = tmp;
         }
     }
@@ -119,6 +125,9 @@ void initSFML()
 
 int main(int argc, char *argv[])
 {
+    std::vector<std::pair<int, int>> line;
+    line = getLineCoordinates(5, 5, 5, 15);
+
     initSFML();
 
     // Initialize console
@@ -137,8 +146,10 @@ int main(int argc, char *argv[])
     rng.seed(seed);
 
     // create player and the world (only one level for now)
-    ecs::createEntity(playerID)->assign(Position(5, 5))->assign(Renderable('@', 0x0055AAFF));
-    //world = std::make_shared<World>(gui->getLayer(0)->console->widthInChars, gui->getLayer(0)->console->heightInChars);
+    ecs::createEntity(playerID)
+        ->assign(Position(5, 5))
+        ->assign(Renderable('@', 0x0055AAFF))
+        ->assign(Vision(5)); // TODO: not hard-code this and other things...
     
     world = std::make_unique<World>();
     world->addLevel("Dungeon Level 1", 50, 30);
@@ -148,6 +159,7 @@ int main(int argc, char *argv[])
 
     // add and configure systems
     ecs::addSystem<PlayerSystem>();
+    ecs::addSystem<VisibilitySystem>();
     ecs::addSystem<CameraSystem>();
     ecs::addSystem<ActorMovementSystem>();
     ecs::configureAllSystems();
