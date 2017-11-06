@@ -4,6 +4,7 @@
  * Field of Vision and related things.
  */
 
+#include <cmath>
 #include "ecs.h"
 #include "components.h"
 #include "world.h"
@@ -11,6 +12,8 @@
 
 extern std::unique_ptr<World> world;
 
+// Start of my own ray-casting FOV algorithm.
+// It works ok-ish, but the results are not satisfactory.
 void castRay(std::vector<std::pair<int, int>> line)
 {
     std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
@@ -31,7 +34,6 @@ void castRay(std::vector<std::pair<int, int>> line)
         }
     }
 }
-
 void myRayCastingFOVAlgorithm()
 {
     const int fov = ecs::entity(playerID)->component<Vision>()->fovRadius; 
@@ -71,6 +73,7 @@ void myRayCastingFOVAlgorithm()
         castRay(getLineCoordinatesBresenham(startx, starty, endx, endy));
     } // end of second y loop
 }
+// End of my algorithm
 
 // Draw a line from x0,y0 to x1,y1
 // Return vector of int pairs, each pair contains one coordinate on the line.
@@ -105,7 +108,7 @@ std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int 
     return line;
 }
 
-// Bresenham algorithm, based on http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#C.2B.2B
+// Same as above, but Bresenham's algorithm, based on http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#C.2B.2B
 std::vector<std::pair<int, int>> getLineCoordinatesBresenham(int x0, int y0, int x1, int y1)
 {
     std::vector<std::pair<int, int>> line;
@@ -154,3 +157,85 @@ std::vector<std::pair<int, int>> getLineCoordinatesBresenham(int x0, int y0, int
 
     return line;
 }
+
+
+// The shadowcasting algorithm below is based on this article:
+// http://www.roguebasin.com/index.php?title=C%2B%2B_shadowcasting_implementation
+// I basically copied the code in the article and modified it to fit my program.
+
+static int multipliers[4][8] = {
+    {1, 0,  0, -1, -1,  0,  0, 1},
+    {0, 1, -1,  0,  0, -1,  1, 0},
+    {0, 1,  1,  0,  0, -1, -1, 0},
+    {1, 0,  0,  1, -1,  0,  0,-1}
+};
+
+void castLight(u32 x, u32 y, u32 radius, u32 row, float start_slope, float end_slope, u32 xx, u32 xy, u32 yx, u32 yy) {
+
+    std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
+
+    if (start_slope < end_slope) {
+        return;
+    }
+    float next_start_slope = start_slope;
+    for (u32 i = row; i <= radius; i++) {
+        bool blocked = false;
+        for (int dx = -i, dy = -i; dx <= 0; dx++) {
+            float l_slope = (dx - 0.5) / (dy + 0.5);
+            float r_slope = (dx + 0.5) / (dy - 0.5);
+            if (start_slope < r_slope) {
+                continue;
+            } else if (end_slope > l_slope) {
+                break;
+            }
+
+            int sax = dx * xx + dy * xy;
+            int say = dx * yx + dy * yy;
+            if ((sax < 0 && (u32)std::abs(sax) > x) || (say < 0 && (u32)std::abs(say) > y)) {
+                continue;
+            }
+            u32 ax = x + sax;
+            u32 ay = y + say;
+            if (ax >= world->currentLevel->width || ay >= world->currentLevel->height) {
+                continue;
+            }
+
+            u32 radius2 = radius * radius;
+            if ((u32)(dx * dx + dy * dy) < radius2) {
+                fovMap[ax][ay] = true;
+            }
+
+            if (blocked) {
+                if(world->currentLevel->cache[ax][ay].blocksLight) {
+                    next_start_slope = r_slope;
+                    continue;
+                } else {
+                    blocked = false;
+                    start_slope = next_start_slope;
+                }
+            } else if(world->currentLevel->cache[ax][ay].blocksLight) {
+                blocked = true;
+                next_start_slope = r_slope;
+                castLight(x, y, radius, i + 1, start_slope, l_slope, xx, xy, yx, yy);
+            }
+        }
+        if (blocked) {
+            break;
+        }
+    }
+}
+
+void doShadowCastingFOV(Position *pos, Vision *v) {
+    std::array<std::array<bool, 256>, 256> &fovMap = ecs::entity(playerID)->component<Vision>()->fovMap;
+    fovMap = {};
+    for (u32 i = 0; i < 8; i++) {
+        castLight(pos->x, pos->y, v->fovRadius, 1, 1.0, 0.0, multipliers[0][i], multipliers[1][i], multipliers[2][i], multipliers[3][i]);
+    }
+}
+
+
+
+
+
+
+// vim: fdm=syntax

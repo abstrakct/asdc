@@ -73,7 +73,8 @@ void VisibilitySystem::configure()
 {
         systemName = "Visibility System";
         subscribe<PlayerMovedMessage>([](PlayerMovedMessage &msg) {
-                myRayCastingFOVAlgorithm();
+                //myRayCastingFOVAlgorithm();
+                doShadowCastingFOV(ecs::entity(playerID)->component<Position>(), ecs::entity(playerID)->component<Vision>());
                 });
 }
 

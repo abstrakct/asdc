@@ -83,13 +83,13 @@ void World::generate()
 {
     currentLevel->fill(makeFloor);
     currentLevel->generateFrame();
-    //for (u32 x = 0; x < currentLevel->width; x++) {
-    //    for (u32 y = 0; y < currentLevel->height; y++) {
-    //        if(one_in(4)) {
-    //            currentLevel->cells.push_back(makeWall(x, y));
-    //        }
-    //    }
-    //}
+    for (u32 x = 0; x < currentLevel->width; x++) {
+        for (u32 y = 0; y < currentLevel->height; y++) {
+            if(one_in(4)) {
+                currentLevel->cells.push_back(makeWall(x, y));
+            }
+        }
+    }
 }
 
 void World::addLevel(std::string levelName, u32 w, u32 h)
