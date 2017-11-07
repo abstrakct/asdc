@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
     ecs::createEntity(playerID)
         ->assign(Position(5, 5))
         ->assign(Renderable('@', 0x0055AAFF))
-        ->assign(Vision(10)); // TODO: not hard-code this and other things...
+        ->assign(Vision(20)); // TODO: not hard-code this and other things...
     
     world = std::make_unique<World>();
     world->addLevel("Dungeon Level 1", 50, 30);

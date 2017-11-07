@@ -199,9 +199,26 @@ inline void unsetComponentMask(const u64 id, const u64 familyID, bool deleteIfEm
     }
 }
 
+template<class C>
+inline void deleteComponent(const u64 entityID, bool deleteEntityIfEmpty=false) noexcept {
+    auto eptr = entity(entityID);
+    if (!eptr) return;
+    Entity e = *entity(entityID);
+    C emptyComponent;
+    Component<C> temp(emptyComponent);
+    if(!e.componentMask.test(temp.familyID)) return;
+    for(Component<C> &component : static_cast<ComponentStore<Component<C>> *>(componentStore[temp.familyID].get())->components) {
+        if (component.entityID == entityID) {
+            component.deleted = true;
+            unsetComponentMask(entityID, temp.familyID, deleteEntityIfEmpty);
+        }
+    }
+}
+
 /* 
  * I wrote this one myself, and it works! I consider it proof that I now understand this architecture pretty well. 
  * This returns a vector with all Entities that have a component of type C
+ * TODO: it is slow, maybe. check that, and update function to match the one in RLTK if so.
  */
 template<class C>
 inline std::vector<Entity *> findAllEntitiesWithComponent()
@@ -355,6 +372,8 @@ template <class MSG> inline void emit(MSG message)
         }
     }
 }
+
+void collectGarbage();
 
 } // namespace ecs
 // vim: fdm=syntax

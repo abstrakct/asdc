@@ -8,6 +8,7 @@
 #include "ecs.h"
 #include "components.h"
 
+std::vector<ecs::Entity*> findAllEntitiesAtPosition(u32 x, u32 y);
 bool positionBlocksMovement(u32 x, u32 y);
 ecs::Entity* makeWall(u32 x, u32 y);
 ecs::Entity* makeFloor(u32 x, u32 y);
@@ -26,8 +27,12 @@ class Level {
         Level() {};
         Level(u32 w, u32 h);
         ~Level();
-        void generateFrame();
+
+        //void generateFrame();
+        void generateFrame(u32 x1, u32 y1, u32 x2, u32 y2);
+        void generateVillage();
         void fill(ecs::Entity* (*makerFunction)(u32 x, u32 y));
+        void makeWall(u32 x, u32 y);
 
         u32 width, height;
         std::vector<ecs::Entity *> cells;
