@@ -11,7 +11,7 @@
 
 #include "common.h"
 
-// TODO: Add printing function! For strings!
+// TODO: Add printing function! For strings! (EDIT: pretty much done! could use some error checking.)
 
 // Helper macros
 #define RED(c)   ((c & 0xff000000) >> 24)
@@ -55,6 +55,7 @@ class Console {
         void setFont(std::string font, u8 cw, u8 ch, u32 iw, u32 ih);
 
         void fillColor(u32 color);
+        void fillColor(sf::Color color);
         void fillChar(unsigned char c);
         void clear();
         void render(sf::RenderWindow &window);
@@ -62,8 +63,10 @@ class Console {
 
         void put(u32 cellX, u32 cellY, unsigned char c);
         void put(u32 cellX, u32 cellY, unsigned char c, u32 color);
+        void put(u32 cellX, u32 cellY, unsigned char c, sf::Color color);
         void print(int x, int y, std::string text);
         void print(int x, int y, std::string text, u32 fgColor);
+        void print(int x, int y, std::string text, sf::Color fgColor);
 
         bool dirty = true;
         u32 widthInChars;

@@ -20,6 +20,8 @@
 #include "world.h"
 #include "input.h"
 #include "utils.h"
+#include "datafiles.h"
+#include "levelfactory.h"
 
 #define FPS_LIMIT      60
 
@@ -32,6 +34,8 @@ std::shared_ptr<Console> mapConsole;         // pass as parameter instead of glo
 
 u64 seed;
 std::mt19937 rng;
+
+Config c;
 
 // NEXT TODO:
 // Build a GUI class that can handle multiple consoles/layers of various sizes.
@@ -55,18 +59,20 @@ std::mt19937 rng;
  */
 void buildMapCache(std::shared_ptr<Level> level)
 {
+    // TODO: this probably needs to be improved if we add invisible entities
     MapCacheCell tmp;
     for (auto it : level->cells) {
         Position *pos = it->component<Position>();
         Renderable *r = it->component<Renderable>();
         MapCell *cell = it->component<MapCell>();
         Physicality *p= it->component<Physicality>();
-        if(pos && r && cell) {
-            tmp.type = cell->type;
-            tmp.glyph = r->glyph;
-            tmp.fgColor = r->fgColor;
-            tmp.blocksLight = p->blocksLight;
-            level->cache[pos->x][pos->y] = tmp;
+        if(pos && r && cell && p) {
+            if(p->visible) {
+                tmp.glyph = r->glyph;
+                tmp.fgColor = r->fgColor;
+                tmp.blocksLight = p->blocksLight;
+                level->cache[pos->x][pos->y] = tmp;
+            }
         }
     }
 }
@@ -113,7 +119,7 @@ void run(std::function<void(double)> on_tick)
 
 void initSFML()
 {
-    window.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "asdc");
+    window.create(sf::VideoMode(c.interface.screenWidth, c.interface.screenHeight), "asdc");
     sf::Vector2i windowPosition;
     // TODO: remove hard coded values, set position to center of screen
     windowPosition.x = 300;
@@ -126,11 +132,14 @@ void initSFML()
 
 int main(int argc, char *argv[])
 {
+    c = readConfigFiles();
+
     initSFML();
 
     // Initialize console
-    gui = std::make_unique<GUI>(SCREEN_WIDTH, SCREEN_HEIGHT);
-    gui->addLayer(rootLayer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "res/fonts/Cheepicus_16x16.png", 16, 16);
+    // TODO: make dynamic based on config/datafiles!
+    gui = std::make_unique<GUI>(c.interface.screenWidth, c.interface.screenHeight);
+    gui->addLayer(rootLayer, 0, 0, c.interface.screenWidth, c.interface.screenHeight, "res/fonts/Cheepicus_16x16.png", 16, 16);
     gui->addLayer(mapLayer,  16, 16, 800, 480, "res/fonts/terminal16x16.png", 16, 16);
 
     mapConsole = layer(mapLayer)->console;
@@ -147,13 +156,15 @@ int main(int argc, char *argv[])
     // create player and the world (only one level for now)
     ecs::createEntity(playerID)
         ->assign(Position(5, 5))
-        ->assign(Renderable('@', 0x0055AAFF))
+        ->assign(Renderable('@', sf::Color(0x0055AAFF)))
         ->assign(Vision(20)); // TODO: not hard-code this and other things...
     
     world = std::make_unique<World>();
     world->addLevel("Dungeon Level 1", 50, 30);
     world->setCurrentLevel("Dungeon Level 1");
     world->generate();
+    LevelFactory lf(world->currentLevel, c);
+    lf.defineCell(4, 4, "wall");
     buildMapCache(world->currentLevel);
 
     // add and configure systems

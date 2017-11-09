@@ -7,9 +7,6 @@
 #include <stdint.h>
 #include <random>
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
-
 extern std::mt19937 rng;
 
 typedef uint8_t   u8;

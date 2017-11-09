@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <SFML/Graphics.hpp>
 #include "ecs.h"
 
 /*
@@ -21,13 +22,14 @@ struct Health {
 
 /*
  * Position component.
- * Hold position data. Only x, y for now.
+ * Hold position data. For now: x, y and level.
  */
 struct Position {
     Position() {}
     Position(u32 _x, u32 _y) : x(_x), y(_y) {}
 
     u32 x, y;
+    //std::string level;
 };
 
 /*
@@ -36,10 +38,10 @@ struct Position {
  */
 struct Renderable {
     Renderable() {}
-    Renderable(unsigned char g, u32 c) : glyph(g), fgColor(c) {}
+    Renderable(unsigned char g, sf::Color c) : glyph(g), fgColor(c) {}
 
     unsigned char glyph;
-    u32 fgColor;
+    sf::Color fgColor;
 };
 
 /*
@@ -53,22 +55,26 @@ enum MapCellType {
 };
 
 struct MapCell {
-    MapCell() {}
-    MapCell(MapCellType t) : type(t) {}
-
-    MapCellType type = cellUnused;
+//    MapCell() {}
+//    MapCell(MapCellType t) : type(t) {}
+//
+//    MapCellType type = cellUnused;
 };
 
 /*
  * Physicality component. Handles the physical properties of an entity.
  * For now, whether it blocks light or not, and whether it blocks movement or not.
+ * Also whether or not the entity is actually visible. E.g. a floor doesn't block
+ * light or movement, but it's still visible.
+ * A trap or something else hidden can be not visible and not blocking light/movement.
  */
 struct Physicality {
     Physicality() {}
-    Physicality(bool l, bool m) : blocksLight(l), blocksMovement(m) {}
+    Physicality(bool l, bool m, bool v) : blocksLight(l), blocksMovement(m), visible(v) {}
 
     bool blocksLight;
     bool blocksMovement;
+    bool visible;        // TODO: use this for FOV? probably not very efficient?
 };
 
 /*

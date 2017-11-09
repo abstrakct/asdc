@@ -42,10 +42,8 @@ void CameraSystem::update(const double durationMS)
 
         for (i32 x = startx; x <= (i32)endx; x++) {
             for (i32 y = starty; y <= (i32)endy; y++) {
-                if (world->currentLevel->cache[x][y].type != cellUnused) {
-                    if (v->fovMap[x][y]) {
-                        mapConsole->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fgColor);
-                    }
+                if (v->fovMap[x][y]) {
+                    mapConsole->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fgColor);
                 }
             }
         }

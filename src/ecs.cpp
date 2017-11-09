@@ -22,10 +22,6 @@ u64 Entity::entityCounter{0};
 u64 BaseComponent::typeCounter = 0;
 u64 BaseMessage::typeCounter = 0;
 
-// Borrowed from RLTK because I really like it :)
-// My understanding: it looks up the entity with a specific ID in entityStore and returns a reference to it.
-// Returns false if no entity with ID is found, or entity is deleted.
-// segfaults if you try to just do entity(invalidid)->...
 Entity* entity(const u64 id) noexcept {
     Entity *result = nullptr;
 	auto finder = entityStore.find(id);

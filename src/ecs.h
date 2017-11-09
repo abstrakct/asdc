@@ -1,7 +1,8 @@
 /*
  * entity.h
  *
- * A lot of this (almost everything) has been adopted from RLTK - github.com/thebracket
+ * A lot of this (almost everything) has been adopted from RLTK - credits: github.com/thebracket - huge thanks!
+ * Unless otherwise noted, assume everything is taken directly from RLTK, or heavily based on code from RLTK!
  */
 
 #pragma once
@@ -375,5 +376,60 @@ template <class MSG> inline void emit(MSG message)
 
 void collectGarbage();
 
+/*
+ * each, overloaded with a function/lambda that accepts an entity, will call the provided function on _every_ entity in the system.
+ */
+void each(std::function<void(Entity &)> &&func);
+
+/*
+ * Variadic each. Use this to call a function for all entities having a discrete set of components.
+ * For example: each<Position, AI>([] (Entity &e, Position &pos, AI &brain) { ... code ... });
+ */
+template <typename... Cs, typename F>
+inline void each(F callback) {
+    std::array<u64, sizeof...(Cs)> familyIDs{ {Component<Cs>{}.familyID...} };
+    for (auto it = entityStore.begin(); it != entityStore.end(); ++it) {
+        if (!it->second.deleted) {
+            bool matches = true;
+            for (const u64 &compare : familyIDs) {
+                if (!it->second.componentMask.test(compare)) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches) {
+                // Call the functor
+                callback(it->second, *it->second.component<Cs>()...);
+            }
+        }
+    }
+}
+
+/*
+ * Variadic each_if. Use this to call a function for all entities having a discrete set of components. For example,
+ * each_if<position, ai>([] (entity_t &e, position &pos, ai &brain) { ... code returns true if needs processing ... },
+ * [] (entity_t &e, position &pos, ai &brain) { ... code ... });
+ */
+template <typename... Cs, typename P, typename F>
+inline void each_if(P&& predicate, F callback) {
+    std::array<size_t, sizeof...(Cs)> familyIDs{ {Component<Cs>{}.familyID...} };
+    for (auto it=entityStore.begin(); it!=entityStore.end(); ++it) {
+        if (!it->second.deleted) {
+            bool matches = true;
+            for (const std::size_t &compare : familyIDs) {
+                if (!it->second.componentMask.test(compare)) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches && predicate(it->second, *it->second.component<Cs>()...)) {
+                // Call the functor
+                callback(it->second, *it->second.component<Cs>()...);
+            }
+        }
+    }
+}
+
 } // namespace ecs
+
 // vim: fdm=syntax

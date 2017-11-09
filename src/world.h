@@ -14,10 +14,9 @@ ecs::Entity* makeWall(u32 x, u32 y);
 ecs::Entity* makeFloor(u32 x, u32 y);
 
 struct MapCacheCell {
-    MapCellType type;
     unsigned char glyph;
-    u32 fgColor;
-    bool blocksLight;
+    sf::Color fgColor;
+    bool blocksLight; 
 };
 
 class Level {
@@ -30,9 +29,10 @@ class Level {
 
         //void generateFrame();
         void generateFrame(u32 x1, u32 y1, u32 x2, u32 y2);
+        void generateHouse(u32 x1, u32 y1, u32 x2, u32 y2);
         void generateVillage();
         void fill(ecs::Entity* (*makerFunction)(u32 x, u32 y));
-        void makeWall(u32 x, u32 y);
+        void changeIntoWall(u32 x, u32 y);
 
         u32 width, height;
         std::vector<ecs::Entity *> cells;

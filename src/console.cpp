@@ -97,6 +97,15 @@ void Console::fillColor(u32 color)
     }
 }
 
+void Console::fillColor(sf::Color color)
+{
+    for (u32 y = 0; y < heightInChars; y++) {
+        for (u32 x = 0; x < widthInChars; x++) {
+            cell[x][y].fgColor = color;
+        }
+    }
+}
+
 
 void Console::fillChar(unsigned char c)
 {
@@ -166,6 +175,12 @@ void Console::put(u32 x, u32 y, unsigned char c, u32 color)
     cell[x][y].fgColor = newColor;
 }
 
+void Console::put(u32 x, u32 y, unsigned char c, sf::Color color)
+{
+    cell[x][y].c = c;
+    cell[x][y].fgColor = color;
+}
+
 void Console::print(int x, int y, std::string text)
 {
     // TODO: ERROR checking etc!
@@ -176,6 +191,15 @@ void Console::print(int x, int y, std::string text)
 }
 
 void Console::print(int x, int y, std::string text, u32 fgColor)
+{
+    // TODO: ERROR checking etc!
+    for (auto c : text) {
+        put(x, y, c, fgColor);
+        x++;
+    }
+}
+
+void Console::print(int x, int y, std::string text, sf::Color fgColor)
 {
     // TODO: ERROR checking etc!
     for (auto c : text) {
