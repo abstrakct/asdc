@@ -38,10 +38,11 @@ struct Position {
  */
 struct Renderable {
     Renderable() {}
-    Renderable(unsigned char g, sf::Color c) : glyph(g), fgColor(c) {}
+    Renderable(unsigned char g, sf::Color fg, sf::Color bg) : glyph(g), fgColor(fg), bgColor(bg) {}
 
     unsigned char glyph;
     sf::Color fgColor;
+    sf::Color bgColor;
 };
 
 /*

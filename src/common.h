@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <random>
 
+typedef std::vector<std::pair<int, int>> PointVector;
+
 extern std::mt19937 rng;
 
 typedef uint8_t   u8;

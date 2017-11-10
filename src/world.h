@@ -27,14 +27,8 @@ class Level {
         Level(u32 w, u32 h);
         ~Level();
 
-        //void generateFrame();
-        void generateFrame(u32 x1, u32 y1, u32 x2, u32 y2);
-        void generateHouse(u32 x1, u32 y1, u32 x2, u32 y2);
-        void generateVillage();
-        void fill(ecs::Entity* (*makerFunction)(u32 x, u32 y));
-        void changeIntoWall(u32 x, u32 y);
-
-        u32 width, height;
+        int width, height;
+        u32 lastx, lasty;
         std::vector<ecs::Entity *> cells;
         std::array<std::array<MapCacheCell, 256>, 256> cache; // TODO: remove hard coded values!
 };
@@ -44,7 +38,6 @@ class World {
     public:
         World() {};
 
-        void generate();
         void addLevel(std::string levelName, u32 w, u32 h);
         void setCurrentLevel(std::string name) {
             if(level.find(name) != level.end())

@@ -79,9 +79,9 @@ void myRayCastingFOVAlgorithm()
 // Return vector of int pairs, each pair contains one coordinate on the line.
 // DDA algorithm, based on https://www.tutorialspoint.com/computer_graphics/line_generation_algorithm.htm
 // and http://www.geeksforgeeks.org/dda-line-generation-algorithm-computer-graphics/
-std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int y1)
+PointVector getLineCoordinates(int x0, int y0, int x1, int y1)
 {
-    std::vector<std::pair<int, int>> line;
+    PointVector line;
 
     float x = x0;
     float y = y0;
@@ -109,9 +109,9 @@ std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int 
 }
 
 // Same as above, but Bresenham's algorithm, based on http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#C.2B.2B
-std::vector<std::pair<int, int>> getLineCoordinatesBresenham(int x0, int y0, int x1, int y1)
+PointVector getLineCoordinatesBresenham(int x0, int y0, int x1, int y1)
 {
-    std::vector<std::pair<int, int>> line;
+    PointVector line;
 
     int deltax = x1 - x0;
     int deltay = y1 - y0;
@@ -194,8 +194,8 @@ void castLight(u32 x, u32 y, u32 radius, u32 row, float start_slope, float end_s
             if ((sax < 0 && (u32)std::abs(sax) > x) || (say < 0 && (u32)std::abs(say) > y)) {
                 continue;
             }
-            u32 ax = x + sax;
-            u32 ay = y + say;
+            int ax = x + sax;
+            int ay = y + say;
             if (ax >= world->currentLevel->width || ay >= world->currentLevel->height) {
                 continue;
             }

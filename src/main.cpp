@@ -57,7 +57,7 @@ Config c;
  *   Bumping height to 45 seems to have a big impact though... conclusion: it's probably good enough for now! But larger maps will need optimization / different handling of things.
  *   FINAL NOTE: building with optimization -O3 pretty much eliminates the problem even on large maps! What did we learn? Let the compiler do its magic! 
  */
-void buildMapCache(std::shared_ptr<Level> level)
+void buildMapCache(std::shared_ptr<Level> level, bool wizMode = false)
 {
     // TODO: this probably needs to be improved if we add invisible entities
     MapCacheCell tmp;
@@ -70,11 +70,22 @@ void buildMapCache(std::shared_ptr<Level> level)
             if(p->visible) {
                 tmp.glyph = r->glyph;
                 tmp.fgColor = r->fgColor;
-                tmp.blocksLight = p->blocksLight;
+                if(wizMode)
+                    tmp.blocksLight = false;
+                else
+                    tmp.blocksLight = p->blocksLight;
                 level->cache[pos->x][pos->y] = tmp;
             }
         }
     }
+}
+
+// For debugging only:
+void wizardMode()
+{
+    buildMapCache(world->currentLevel, true);
+    mapConsole->dirty = true;
+    emit(PlayerMovedMessage{});
 }
 
 // Tick is called every frame. The parameter specifies how many ms have elapsed
@@ -88,7 +99,6 @@ void run(std::function<void(double)> on_tick)
     double durationMS = 0.0;
     bool done = false;
 
-
     while(window.isOpen() && !done) {
         clock_t startTime = clock();
         sf::Event event;
@@ -98,7 +108,9 @@ void run(std::function<void(double)> on_tick)
                 done = true;
             if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
                 done = true;
-            if(event.type == sf::Event::KeyPressed)
+            else if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F1)
+                wizardMode();
+            else if(event.type == sf::Event::KeyPressed)
                 ecs::emit(KeyPressed{event});
             if(event.type == sf::Event::MouseMoved) {
                 setMousePosition(event.mouseMove.x, event.mouseMove.y);
@@ -109,7 +121,7 @@ void run(std::function<void(double)> on_tick)
 
         //window.clear();
         
-        on_tick(durationMS);
+        on_tick(durationMS);  // EDIT: runs ecs::tick  ------- runs tick(double) - see above
 
         window.display();
 
@@ -155,16 +167,17 @@ int main(int argc, char *argv[])
 
     // create player and the world (only one level for now)
     ecs::createEntity(playerID)
-        ->assign(Position(5, 5))
-        ->assign(Renderable('@', sf::Color(0x0055AAFF)))
-        ->assign(Vision(20)); // TODO: not hard-code this and other things...
+        ->assign(Position(25, 15))
+        ->assign(Renderable('@', sf::Color(0x0055AAFF), sf::Color(0x00000000)))
+        ->assign(Vision(50)); // TODO: not hard-code this and other things...
     
     world = std::make_unique<World>();
     world->addLevel("Dungeon Level 1", 50, 30);
     world->setCurrentLevel("Dungeon Level 1");
-    world->generate();
+
     LevelFactory lf(world->currentLevel, c);
-    lf.defineCell(4, 4, "wall");
+    lf.build();
+
     buildMapCache(world->currentLevel);
 
     // add and configure systems
@@ -175,7 +188,7 @@ int main(int argc, char *argv[])
     ecs::configureAllSystems();
 
     // RUN!
-    run(tick);
+    run(ecs::tick);
 
     // Destroy everything and exit
     window.close();

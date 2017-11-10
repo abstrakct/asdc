@@ -12,10 +12,29 @@
 
 class LevelFactory {
     public:
-        LevelFactory(std::shared_ptr<Level> l, Config& conf) : level(l), c(conf) {}
+        LevelFactory(std::shared_ptr<Level> l, Config& conf);
+        void setLevel(std::shared_ptr<Level> l) { level = l; }
+
+        void createCell(u32 x, u32 y, std::string def);
         void defineCell(u32 x, u32 y, std::string def);
+
+        // "Painting" on our "canvas"
+        void paintCell(u32 x, u32 y, std::string def) { canvas[x][y] = defToCanvas[def]; }
+        void paintLine(int x0, int y0, int x1, int y1, std::string def);
+        void paintRectangle(int x1, int y1, int x2, int y2, std::string def);
+        void fill(std::string def);
+
+        void build();
+
+        // Various dungeon types/variants. TODO: any benefit to separating these into their own classes? using templates with LevelFactory?
+        void generateDrunkenWalk();
+
     private:
+        void canvasToEntities();
         std::shared_ptr<Level> level;
         Config& c;
+        std::unordered_map<std::string, int> defToCanvas;
+        std::unordered_map<int, std::string> canvasToDef;
+        int canvas[256][256] = {};  // TODO: use std::array instead?
 };
 

@@ -36,7 +36,7 @@ Console::~Console()
 {
 }
 
-sf::IntRect Console::rectForGlyph(unsigned char c)
+sf::IntRect Console::rectForGlyph(unsigned char c) const
 {
     int index = c;
     int charsPerRow = (fontImageWidth / fontCharWidth);
@@ -208,7 +208,7 @@ void Console::print(int x, int y, std::string text, sf::Color fgColor)
     }
 }
 
-Rectangle Console::cellToRectangle(u32 x, u32 y)
+Rectangle Console::cellToRectangle(u32 x, u32 y) const
 {
     Rectangle result;
 

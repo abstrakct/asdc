@@ -45,7 +45,7 @@ class Console {
         sf::RenderTexture tex;
         int xOffset, yOffset;
 
-        sf::IntRect rectForGlyph(unsigned char c);
+        sf::IntRect rectForGlyph(unsigned char c) const;
         void createSprites();
     public:
         Console(int xO, int yO, u32 w, u32 h);
@@ -72,5 +72,5 @@ class Console {
         u32 widthInChars;
         u32 heightInChars;
         u8 fontCharWidth, fontCharHeight;
-        Rectangle cellToRectangle(u32 x, u32 y);
+        Rectangle cellToRectangle(u32 x, u32 y) const;
 };

@@ -17,5 +17,5 @@ void myRayCastingFOVAlgorithm();
 
 void doShadowCastingFOV(Position *pos, Vision *v);
 
-std::vector<std::pair<int, int>> getLineCoordinates(int x0, int y0, int x1, int y1);
-std::vector<std::pair<int, int>> getLineCoordinatesBresenham(int x0, int y0, int x1, int y1);
+PointVector getLineCoordinates(int x0, int y0, int x1, int y1);
+PointVector getLineCoordinatesBresenham(int x0, int y0, int x1, int y1);

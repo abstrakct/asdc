@@ -18,7 +18,6 @@ extern std::shared_ptr<Console> mapConsole;
 extern sf::RenderWindow window;
 extern sf::RenderTexture tex;
 
-// PROBABLY RESOLVED_TODO: rendering is still too slow! Look into optimizations!
 
 void CameraSystem::update(const double durationMS)
 {
@@ -30,15 +29,15 @@ void CameraSystem::update(const double durationMS)
 
         mapConsole->clear();
 
-        i32 startx = (pos->x - v->fovRadius);
-        u32 endx   = (pos->x + v->fovRadius);
-        i32 starty = (pos->y - v->fovRadius);
-        u32 endy   = (pos->y + v->fovRadius);
+        int startx = (pos->x - v->fovRadius);
+        int endx   = (pos->x + v->fovRadius);
+        int starty = (pos->y - v->fovRadius);
+        int endy   = (pos->y + v->fovRadius);
 
         if (startx <= 0) startx = 0;
         if (starty <= 0) starty = 0;
-        if (endx >= world->currentLevel->width)  endx = world->currentLevel->width  - 1;
-        if (endy >= world->currentLevel->height) endy = world->currentLevel->height - 1;
+        if (endx >= world->currentLevel->width)  endx = world->currentLevel->lastx;
+        if (endy >= world->currentLevel->height) endy = world->currentLevel->lasty;
 
         for (i32 x = startx; x <= (i32)endx; x++) {
             for (i32 y = starty; y <= (i32)endy; y++) {

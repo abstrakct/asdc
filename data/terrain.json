@@ -1,0 +1,23 @@
+{
+    "terrain_definitions": [
+        {
+            "id": "floor",
+            "glyph": ".",
+            "fg_color": "444444FF",
+            "bg_color": "00000000",
+            "blocks_light": false,
+            "blocks_movement": false,
+            "visible": true
+        },
+        {
+            "id": "wall",
+            "glyph": "#",
+            "fg_color": "AAAAAAFF",
+            "bg_color": "00000000",
+            "blocks_light": true,
+            "blocks_movement": true,
+            "visible": true
+        }
+    ]
+}
+

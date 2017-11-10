@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include "common.h"
 
@@ -22,7 +23,8 @@ struct GameConfig {
 struct TerrainDefinition {
     std::string id;
     unsigned char glyph;
-    // TODO: how to translate a color/string to sf::Color?
+    sf::Color fgColor;
+    sf::Color bgColor;
     bool blocksLight;
     bool blocksMovement;
     bool visible;

@@ -1,0 +1,11 @@
+{
+    "interface_options": [
+        {
+            "screen_width": 1280,
+            "screen_height": 720,
+            "fullscreen": false,
+            "ignoreme": 0
+        }
+    ]
+}
+
