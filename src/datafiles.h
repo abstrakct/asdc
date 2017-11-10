@@ -10,6 +10,7 @@
 
 #define MAIN_CONFIG_FILE "data/config.json"
 #define TERRAIN_CONFIG_FILE "data/terrain.json"
+#define PREFAB_CONFIG_FILE "data/prefab.json"
 
 struct InterfaceConfig {
     u32 screenWidth, screenHeight;

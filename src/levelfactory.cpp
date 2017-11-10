@@ -140,8 +140,10 @@ void LevelFactory::generateDrunkenWalk()
                 case 4: y--; break;
             }
 
-            if(x < level->lastx && y < level->lasty)
-                paintCell(x, y, "floor");
+            if(x < level->lastx && y < level->lasty) {
+                if(canvas[x][y] == defToCanvas["wall"])
+                    paintCell(x, y, "floor");
+            }
         }
     }
 }
