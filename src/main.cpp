@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "datafiles.h"
 #include "levelfactory.h"
+#include "game.h"
 
 #define FPS_LIMIT      60
 
@@ -35,6 +36,7 @@ std::shared_ptr<Console> mapConsole;         // pass as parameter instead of glo
 u64 seed;
 std::mt19937 rng;
 
+GameState gs;
 Config c;
 
 // NEXT TODO:
@@ -84,6 +86,7 @@ void buildMapCache(std::shared_ptr<Level> level, bool wizMode = false)
 void wizardMode()
 {
     buildMapCache(world->currentLevel, true);
+    layer(rootLayer)->addStaticText(1, 62, 22, "Wizard Mode", 0x00ff00ff);
     mapConsole->dirty = true;
     emit(PlayerMovedMessage{});
 }
@@ -108,8 +111,12 @@ void run(std::function<void(double)> on_tick)
                 done = true;
             if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
                 done = true;
-            else if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F1)
-                wizardMode();
+            else if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F1) {
+                if(!gs.isWizardMode) {
+                    wizardMode();
+                    gs.isWizardMode = true;
+                }
+            }
             else if(event.type == sf::Event::KeyPressed)
                 ecs::emit(KeyPressed{event});
             if(event.type == sf::Event::MouseMoved) {
@@ -157,7 +164,7 @@ int main(int argc, char *argv[])
     mapConsole = layer(mapLayer)->console;
     //layer(rootLayer)->console->put(65, 20, '*', 0xFF0000FF);
     layer(rootLayer)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
-    layer(rootLayer)->addStaticText(1, 63, 22, "greentext", 0x00ff00ff);
+    //layer(rootLayer)->addStaticText(1, 63, 22, "greentext", 0x00ff00ff);
     // TODO: Define handles for gui components
 
     // Initialize random number generator.
@@ -187,6 +194,7 @@ int main(int argc, char *argv[])
     ecs::addSystem<ActorMovementSystem>();
     ecs::configureAllSystems();
 
+    gs.isRunning = true;
     // RUN!
     run(ecs::tick);
 

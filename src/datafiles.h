@@ -31,10 +31,17 @@ struct TerrainDefinition {
     bool visible;
 };
 
+struct Prefab {
+    std::string id;
+    int width, height;
+    std::unordered_map<char, std::string> legend;
+};
+
 struct Config {
     InterfaceConfig interface;
     GameConfig game;
     std::unordered_map<std::string, TerrainDefinition> terrain;
+    std::unordered_map<std::string, Prefab> prefab;
 };
 
 Config readConfigFiles();

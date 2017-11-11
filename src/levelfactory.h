@@ -8,7 +8,6 @@
 
 #include "world.h"
 #include "datafiles.h"
-// IDEA: build the level/map in an array, then when complete make entities from the array ?!
 
 class LevelFactory {
     public:

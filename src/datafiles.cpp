@@ -55,7 +55,7 @@ void readTerrainConfigFile(Config& c)
     }
 }
 
-void readPrefabConfigFile()
+void readPrefabConfigFile(Config& c)
 {
     std::ifstream ifs(PREFAB_CONFIG_FILE);
     Json::Reader reader;
@@ -69,10 +69,16 @@ void readPrefabConfigFile()
     Json::Value& prefab = root["prefab"];
     
     for (auto it : prefab) {
-        std::cout << "id: " << it.get("id", "ERROR");
+        // TODO: Check that there's an "id" field, it is required!
+        std::string id = it.get("id", "ERROR").asString();
+        c.prefab[id].id = id;
+        c.prefab[id].width  = it.get("width",  0).asInt();
+        c.prefab[id].height = it.get("height", 0).asInt();
+
         Json::Value thelegend = it.get("legend", "ERROR");
-        for (u32 i = 0; i < thelegend.size(); i++)
-            std::cout << thelegend[i].asString() << " ";
+        for (u32 i = 0; i < thelegend.size(); i+=2) {
+            c.prefab[id].legend[*(thelegend[i].asCString())] = thelegend[i+1].asString();
+        }
     }
 }
 
@@ -82,7 +88,7 @@ Config readConfigFiles()
 
     readMainConfigFile(c);
     readTerrainConfigFile(c);
-    readPrefabConfigFile();
+    readPrefabConfigFile(c);
 
     return c;
 }

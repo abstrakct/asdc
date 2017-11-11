@@ -53,7 +53,7 @@ void LevelFactory::createCell(u32 x, u32 y, std::string def)
 void LevelFactory::defineCell(u32 x, u32 y, std::string def)
 {
     // TODO: is Position and Mapcell enough, or do we also need Renderable and Physicality? Seems to work fine for now...
-    // TODO: becomes very slow when we have many entities!
+    // TODO: can become very slow when we have many entities!
     ecs::each_if<Position, MapCell>( [&x, &y] (ecs::Entity &e, Position &pos, MapCell &m) {
             if (pos.x == x && pos.y == y)
                 return true;
@@ -125,7 +125,7 @@ void LevelFactory::generateDrunkenWalk()
 
     //q = ri(70, level->lastx);
     //r = ri(50, level->lasty);
-    q = level->lastx*3;
+    q = level->lastx*4;
     r = level->lasty*2;
 
     for(i = 2; i < q; ++i) {
