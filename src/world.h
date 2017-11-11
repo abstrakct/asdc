@@ -16,7 +16,10 @@ ecs::Entity* makeFloor(u32 x, u32 y);
 struct MapCacheCell {
     unsigned char glyph;
     sf::Color fgColor;
+    sf::Color bgColor;
+    sf::Color fadedColor;
     bool blocksLight; 
+    bool seen = false;
 };
 
 class Level {

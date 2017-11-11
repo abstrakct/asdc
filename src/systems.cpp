@@ -29,20 +29,29 @@ void CameraSystem::update(const double durationMS)
 
         mapConsole->clear();
 
-        int startx = (pos->x - v->fovRadius);
-        int endx   = (pos->x + v->fovRadius);
-        int starty = (pos->y - v->fovRadius);
-        int endy   = (pos->y + v->fovRadius);
+        //int startx = (pos->x - v->fovRadius);
+        //int endx   = (pos->x + v->fovRadius);
+        //int starty = (pos->y - v->fovRadius);
+        //int endy   = (pos->y + v->fovRadius);
 
-        if (startx <= 0) startx = 0;
-        if (starty <= 0) starty = 0;
-        if (endx >= world->currentLevel->width)  endx = world->currentLevel->lastx;
-        if (endy >= world->currentLevel->height) endy = world->currentLevel->lasty;
+        //if (startx <= 0) startx = 0;
+        //if (starty <= 0) starty = 0;
+        //if (endx >= world->currentLevel->width)  endx = world->currentLevel->lastx;
+        //if (endy >= world->currentLevel->height) endy = world->currentLevel->lasty;
+
+        int startx = 0;
+        int starty = 0;
+        int endx = world->currentLevel->lastx;
+        int endy = world->currentLevel->lasty;
 
         for (i32 x = startx; x <= (i32)endx; x++) {
             for (i32 y = starty; y <= (i32)endy; y++) {
                 if (v->fovMap[x][y]) {
                     mapConsole->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fgColor);
+                    world->currentLevel->cache[x][y].seen = true;
+                } else if (world->currentLevel->cache[x][y].seen) {
+                    // TODO/IDEA: have the game choose the faded color? Just take the fgcolor and lower the alpha value.
+                    mapConsole->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fadedColor);
                 }
             }
         }

@@ -26,6 +26,7 @@ struct TerrainDefinition {
     unsigned char glyph;
     sf::Color fgColor;
     sf::Color bgColor;
+    sf::Color fadedColor;
     bool blocksLight;
     bool blocksMovement;
     bool visible;

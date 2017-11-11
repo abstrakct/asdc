@@ -14,16 +14,28 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <exception>
 
 #include "fov.h"
 #include "ecs.h"
 #include "levelfactory.h"
 #include "utils.h"
 
+class CouldntPaintIt: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "LevelFactory: Couldn't paint that thing there!";
+  }
+} nope;  // TODO: more descriptive name!
+
+
 LevelFactory::LevelFactory(std::shared_ptr<Level> l, Config& conf) : level(l), c(conf)
 {
     int canvasID = 1;
 
+    defToCanvas["unpainted"] = 0;
+    canvasToDef[0] = "unpainted";
     // Assign an ID to each terrain definition, used for painting our canvas.
     for (auto it : c.terrain) {
         defToCanvas[it.first] = canvasID;
@@ -43,7 +55,7 @@ void LevelFactory::createCell(u32 x, u32 y, std::string def)
     TerrainDefinition d = c.terrain[def];
     level->cells.push_back(ecs::createEntity()
         ->assign(Position(x, y))
-        ->assign(Renderable(d.glyph, d.fgColor, d.bgColor))
+        ->assign(Renderable(d.glyph, d.fgColor, d.bgColor, d.fadedColor))
         ->assign(Physicality(d.blocksLight, d.blocksMovement, d.visible))
         ->assign(MapCell()));
 }
@@ -71,7 +83,7 @@ void LevelFactory::defineCell(u32 x, u32 y, std::string def)
     TerrainDefinition t = c.terrain[def];
     level->cells.push_back(ecs::createEntity()
         ->assign(Position(x, y))
-        ->assign(Renderable(t.glyph, t.fgColor, t.bgColor))
+        ->assign(Renderable(t.glyph, t.fgColor, t.bgColor, t.fadedColor))
         ->assign(Physicality(t.blocksLight, t.blocksMovement, t.visible))
         ->assign(MapCell()));
 }
@@ -84,6 +96,19 @@ void LevelFactory::fill(std::string def)
     for (int x = 0; x < level->width; x++) {
         for (int y = 0; y < level->height; y++) {
             paintCell(x, y, def);
+        }
+    }
+}
+
+/*
+ * Fill unpainted cells on the level with cells of definition def.
+ */
+void LevelFactory::fillUnpainted(std::string def)
+{
+    for (int x = 0; x < level->width; x++) {
+        for (int y = 0; y < level->height; y++) {
+            if (canvas[x][y] == defToCanvas["unpainted"])
+                paintCell(x, y, def);
         }
     }
 }
@@ -117,6 +142,8 @@ void LevelFactory::paintPrefab(int sx, int sy, std::string id)
 
     for (auto it : p.map) {
         for (auto str : it) {
+            if (canvas[x][y] == defToCanvas["wall"])
+                throw nope;
             paintCell(sx + x, sy + y, p.legend[str]);
             x++;
         }
@@ -127,11 +154,25 @@ void LevelFactory::paintPrefab(int sx, int sy, std::string id)
 
 void LevelFactory::build()
 {
-    fill("wall");
+    try {
+        paintPrefab(1, 15, "normal_room");
+    }
+    catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
+    }
+
+    fillUnpainted("wall");
     generateDrunkenWalk();
-    paintPrefab(15, 15, "normal_room");
+
     paintRectangle(0, 0, level->lastx, level->lasty, "wall");
+
     canvasToEntities();
+}
+
+// Generate the classic dungeon with rooms and corridors.
+void LevelFactory::generateClassicDungeonAttemptOne()
+{
+
 }
 
 /*
@@ -144,7 +185,7 @@ void LevelFactory::generateDrunkenWalk()
 
     //q = ri(70, level->lastx);
     //r = ri(50, level->lasty);
-    q = level->lastx*4;
+    q = level->lastx*3;
     r = level->lasty*2;
 
     for(i = 2; i < q; ++i) {

@@ -61,7 +61,7 @@ Config c;
  */
 void buildMapCache(std::shared_ptr<Level> level, bool wizMode = false)
 {
-    // TODO: this probably needs to be improved if we add invisible entities
+     //TODO: this probably needs to be improved if we add invisible entities
     MapCacheCell tmp;
     for (auto it : level->cells) {
         Position *pos = it->component<Position>();
@@ -72,10 +72,14 @@ void buildMapCache(std::shared_ptr<Level> level, bool wizMode = false)
             if(p->visible) {
                 tmp.glyph = r->glyph;
                 tmp.fgColor = r->fgColor;
+                tmp.bgColor = r->bgColor;
+                tmp.fadedColor = r->fadedColor;
+
                 if(wizMode)
                     tmp.blocksLight = false;
                 else
                     tmp.blocksLight = p->blocksLight;
+
                 level->cache[pos->x][pos->y] = tmp;
             }
         }
@@ -106,7 +110,7 @@ void run(std::function<void(double)> on_tick)
         clock_t startTime = clock();
         sf::Event event;
 
-        while(window.pollEvent(event)) {    // waitEvent bedre??
+        while(window.pollEvent(event)) {
             if(event.type == sf::Event::Closed)
                 done = true;
             if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
@@ -175,7 +179,7 @@ int main(int argc, char *argv[])
     // create player and the world (only one level for now)
     ecs::createEntity(playerID)
         ->assign(Position(25, 15))
-        ->assign(Renderable('@', sf::Color(0x0055AAFF), sf::Color(0x00000000)))
+        ->assign(Renderable('@', sf::Color(0x0055AAFF), sf::Color(0x00000000), sf::Color(0x0055AA99)))
         ->assign(Vision(50)); // TODO: not hard-code this and other things...
     
     world = std::make_unique<World>();

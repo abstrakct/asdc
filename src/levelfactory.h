@@ -22,11 +22,13 @@ class LevelFactory {
         void paintLine(int x0, int y0, int x1, int y1, std::string def);
         void paintRectangle(int x1, int y1, int x2, int y2, std::string def);
         void fill(std::string def);
+        void fillUnpainted(std::string def);
         void paintPrefab(int sx, int sy, std::string id);
 
         void build();
 
-        // TODO: child class for various generators!
+        // TODO: child class for various generators!?
+        void generateClassicDungeonAttemptOne();
         void generateDrunkenWalk();
 
     private:

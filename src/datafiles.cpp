@@ -49,12 +49,14 @@ void readTerrainConfigFile(Config& c)
         c.terrain[id].glyph = *(it.get("glyph", "?").asCString());
         c.terrain[id].fgColor = sf::Color(std::stoul(it.get("fg_color", "0xFFFFFFFF").asString(), nullptr, 16));   // convert string with hexadecimal color codes to sf::Color in one swoop!
         c.terrain[id].bgColor = sf::Color(std::stoul(it.get("bg_color", "0x00000000").asString(), nullptr, 16));
+        c.terrain[id].fadedColor = sf::Color(std::stoul(it.get("faded_color", "0x00000000").asString(), nullptr, 16));
         c.terrain[id].blocksLight = it.get("blocks_light", false).asBool();
         c.terrain[id].blocksMovement = it.get("blocks_movement", false).asBool();
         c.terrain[id].visible = it.get("visible", false).asBool();
     }
 }
 
+// TODO/IDEA: allow prefabs to define their own terrain types?!
 void readPrefabConfigFile(Config& c)
 {
     std::ifstream ifs(PREFAB_CONFIG_FILE);

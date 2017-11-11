@@ -5,6 +5,7 @@
             "glyph": ".",
             "fg_color": "444444FF",
             "bg_color": "00000000",
+            "faded_color": "44444444",
             "blocks_light": false,
             "blocks_movement": false,
             "visible": true
@@ -14,6 +15,7 @@
             "glyph": "#",
             "fg_color": "AAAAAAFF",
             "bg_color": "00000000",
+            "faded_color": "AAAAAA44",
             "blocks_light": true,
             "blocks_movement": true,
             "visible": true
