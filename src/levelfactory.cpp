@@ -13,6 +13,8 @@
  */
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
+
 #include "fov.h"
 #include "ecs.h"
 #include "levelfactory.h"
@@ -107,10 +109,27 @@ void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string de
     paintLine(x1, y2, x2, y2, def);
 }
 
+void LevelFactory::paintPrefab(int sx, int sy, std::string id)
+{
+    int x = 0;
+    int y = 0;
+    Prefab p = c.prefab[id];
+
+    for (auto it : p.map) {
+        for (auto str : it) {
+            paintCell(sx + x, sy + y, p.legend[str]);
+            x++;
+        }
+        y++;
+        x = 0;
+    }
+}
+
 void LevelFactory::build()
 {
     fill("wall");
     generateDrunkenWalk();
+    paintPrefab(15, 15, "normal_room");
     paintRectangle(0, 0, level->lastx, level->lasty, "wall");
     canvasToEntities();
 }

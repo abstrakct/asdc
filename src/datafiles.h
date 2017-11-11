@@ -35,6 +35,7 @@ struct Prefab {
     std::string id;
     int width, height;
     std::unordered_map<char, std::string> legend;
+    std::vector<std::string> map;
 };
 
 struct Config {

@@ -79,6 +79,10 @@ void readPrefabConfigFile(Config& c)
         for (u32 i = 0; i < thelegend.size(); i+=2) {
             c.prefab[id].legend[*(thelegend[i].asCString())] = thelegend[i+1].asString();
         }
+        Json::Value themap = it.get("map", "ERROR");
+        for (u32 i = 0; i < themap.size(); i++) {
+            c.prefab[id].map.push_back(themap[i].asString());
+        }
     }
 }
 
