@@ -39,6 +39,7 @@ std::mt19937 rng;
 GameState gs;
 Config c;
 
+//////////// VARIOUS NOTES AND IDEAS AND THOUGHTS
 // NEXT TODO:
 // Build a GUI class that can handle multiple consoles/layers of various sizes.
 
@@ -49,6 +50,7 @@ Config c;
 //
 // TODO: look into regex! also, string formatting.
 /*
+ * BELOW COMMENT IS MORE OR LESS DEPRECATED:
  * Build a cache for a level map, so that we don't need to iterate through a million entities each render loop.
  * Cache is a 2D array inside the Level class that gets allocated in the constructor.
  * Takes a little while to get done, but only needs to be done once for each level.
@@ -59,39 +61,17 @@ Config c;
  *   Bumping height to 45 seems to have a big impact though... conclusion: it's probably good enough for now! But larger maps will need optimization / different handling of things.
  *   FINAL NOTE: building with optimization -O3 pretty much eliminates the problem even on large maps! What did we learn? Let the compiler do its magic! 
  */
-void buildMapCache(std::shared_ptr<Level> level, bool wizMode = false)
-{
-     //TODO: this probably needs to be improved if we add invisible entities
-    MapCacheCell tmp;
-    for (auto it : level->cells) {
-        Position *pos = it->component<Position>();
-        Renderable *r = it->component<Renderable>();
-        MapCell *cell = it->component<MapCell>();
-        Physicality *p= it->component<Physicality>();
-        if(pos && r && cell && p) {
-            if(p->visible) {
-                tmp.glyph = r->glyph;
-                tmp.fgColor = r->fgColor;
-                tmp.bgColor = r->bgColor;
-                tmp.fadedColor = r->fadedColor;
+//////////// END VARIOUS NOTES AND IDEAS AND THOUGHTS
 
-                if(wizMode)
-                    tmp.blocksLight = false;
-                else
-                    tmp.blocksLight = p->blocksLight;
 
-                level->cache[pos->x][pos->y] = tmp;
-            }
-        }
-    }
-}
+
 
 // For debugging only:
 void wizardMode()
 {
-    buildMapCache(world->currentLevel, true);
     layer(rootLayer)->addStaticText(1, 62, 22, "Wizard Mode", 0x00ff00ff);
     mapConsole->dirty = true;
+    emit(RebuildMapCacheMessage(world->currentLevel, true));
     emit(PlayerMovedMessage{});
 }
 
@@ -153,50 +133,62 @@ void initSFML()
     //tex.create(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
+void initGUI()
+{
+    // Initialize console
+    // TODO: make dynamic based on config/datafiles!
+    gui = std::make_unique<GUI>(c.interface.screenWidth, c.interface.screenHeight);
+    gui->addLayer(rootLayer, 0, 0, c.interface.screenWidth, c.interface.screenHeight, "res/fonts/Cheepicus_16x16.png", 16, 16);
+
+    int mapLayerWidth = 800;
+    int mapLayerHeight = 480;
+    gui->addLayer(mapLayer,  16, 16, mapLayerWidth, mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
+    gui->addLayer(msgLayer,  16, mapLayerHeight+16, c.interface.screenWidth, c.interface.screenHeight - mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
+    gui->addLayer(infoLayer, mapLayerWidth+16,  16, c.interface.screenWidth - mapLayerWidth, c.interface.screenHeight, "res/fonts/terminal16x16.png", 16, 16);
+
+    mapConsole = layer(mapLayer)->console;
+    layer(rootLayer)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
+    layer(msgLayer)->addStaticText(1, 1, 1, "messages", 0x00ff00ff);
+    layer(infoLayer)->addStaticText(2, 1, 1, "info", 0x00ff0fff);
+    
+    // TODO: Define handles for gui components
+}
+
 int main(int argc, char *argv[])
 {
     c = readConfigFiles();
 
     initSFML();
 
-    // Initialize console
-    // TODO: make dynamic based on config/datafiles!
-    gui = std::make_unique<GUI>(c.interface.screenWidth, c.interface.screenHeight);
-    gui->addLayer(rootLayer, 0, 0, c.interface.screenWidth, c.interface.screenHeight, "res/fonts/Cheepicus_16x16.png", 16, 16);
-    gui->addLayer(mapLayer,  16, 16, 800, 480, "res/fonts/terminal16x16.png", 16, 16);
+    initGUI();
 
-    mapConsole = layer(mapLayer)->console;
-    //layer(rootLayer)->console->put(65, 20, '*', 0xFF0000FF);
-    layer(rootLayer)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
-    //layer(rootLayer)->addStaticText(1, 63, 22, "greentext", 0x00ff00ff);
-    // TODO: Define handles for gui components
-
-    // Initialize random number generator.
-    // Seed is the current time.
+    // Initialize random number generator. Seed is the current time.
     seed = time(0);
     rng.seed(seed);
 
     // create player and the world (only one level for now)
     ecs::createEntity(playerID)
         ->assign(Position(25, 15))
-        ->assign(Renderable('@', sf::Color(0x0055AAFF), sf::Color(0x00000000), sf::Color(0x0055AA99)))
-        ->assign(Vision(50)); // TODO: not hard-code this and other things...
+        ->assign(Renderable('@', sf::Color(0x36425EFF), sf::Color(0x00000000), sf::Color::Black))
+        ->assign(Vision(5)); // TODO: not hard-code this and other things...
     
     world = std::make_unique<World>();
     world->addLevel("Dungeon Level 1", 50, 30);
     world->setCurrentLevel("Dungeon Level 1");
 
-    LevelFactory lf(world->currentLevel, c);
+    LevelFactory lf(world->currentLevel);
     lf.build();
 
-    buildMapCache(world->currentLevel);
 
     // add and configure systems
+    ecs::addSystem<MapCacheSystem>();
     ecs::addSystem<PlayerSystem>();
     ecs::addSystem<VisibilitySystem>();
     ecs::addSystem<CameraSystem>();
     ecs::addSystem<ActorMovementSystem>();
     ecs::configureAllSystems();
+
+    emit(RebuildMapCacheMessage(world->currentLevel, false));
 
     gs.isRunning = true;
     // RUN!

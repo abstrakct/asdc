@@ -45,7 +45,7 @@ Entity* createEntity()
 Entity* createEntity(u64 newID)
 {
     Entity newEntity(newID);
-    if(entityStore.find(newEntity.id) != entityStore.end()) {
+    if (entityStore.find(newEntity.id) != entityStore.end()) {
         throw std::runtime_error("WARNING! Duplicate Entity IDs! This will not end well!");
     }
     entityStore.emplace(newEntity.id, newEntity);
@@ -54,7 +54,7 @@ Entity* createEntity(u64 newID)
 
 void configureAllSystems()
 {
-    for(std::unique_ptr<BaseSystem> &sys : systemStore)
+    for (std::unique_ptr<BaseSystem> &sys : systemStore)
         sys->configure();
 }
 
@@ -65,7 +65,7 @@ void collectGarbage()
 
     for (auto it = entityStore.begin(); it != entityStore.end(); ++it) {
         if (it->second.deleted) {
-            for(std::unique_ptr<BaseComponentStore> &store : componentStore) {
+            for (std::unique_ptr<BaseComponentStore> &store : componentStore) {
                 if (store)
                     store->eraseByEntityID(it->second.id);
             }
@@ -88,6 +88,7 @@ void tick(const double durationMS)
     for (std::unique_ptr<BaseSystem> &sys : systemStore) {
         sys->update(durationMS);
     }
+    //collectGarbage();
 }
 
 

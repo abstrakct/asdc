@@ -13,6 +13,20 @@
 extern std::unique_ptr<GUI> gui;
 extern std::shared_ptr<Console> mapConsole;
 
+struct MapCacheSystem : public ecs::BaseSystem {
+    virtual void configure() override {
+        systemName = "Map Cache System";
+        subscribe<RebuildMapCacheMessage>([this](RebuildMapCacheMessage &msg) {
+                    buildMapCache(msg);
+                });
+    }
+
+    virtual void update(const double durationMS) override {
+    }
+
+    void buildMapCache(RebuildMapCacheMessage &msg);
+};
+
 struct ActorMovementSystem : public ecs::BaseSystem {
     virtual void configure() override {
         systemName = "Actor Movement System";
@@ -35,12 +49,16 @@ struct PlayerSystem : public ecs::BaseSystem {
         subscribe<ActorMovedMessage>([](ActorMovedMessage &msg) {
                 u32 newx = msg.actor->component<Position>()->x + msg.dx;
                 u32 newy = msg.actor->component<Position>()->y + msg.dy;
-                if (!positionBlocksMovement(newx, newy)) {
+                if (!cellBlocksMovement(newx, newy)) {
                     msg.actor->component<Position>()->x = newx;
                     msg.actor->component<Position>()->y = newy;
                     mapConsole->dirty = true;
                     emit(PlayerMovedMessage{});
-                    }
+                } else if (cellOpen(cellIsOpenable(newx, newy))) {                    // opens entity in cell if entity is openable!
+                    mapConsole->dirty = true;
+                    emit(PlayerMovedMessage{});
+                    return;
+                }
                 });
         subscribe_mbox<KeyPressed>();
     }

@@ -4,6 +4,7 @@
 
 #pragma once
 #include "ecs.h"
+#include "world.h"
 
 struct ActorMovedMessage : ecs::BaseMessage {
     ActorMovedMessage() {}
@@ -14,4 +15,13 @@ struct ActorMovedMessage : ecs::BaseMessage {
 };
 
 struct PlayerMovedMessage : ecs::BaseMessage {
+};
+
+// TODO: rename to BuildMapCacheMessage
+struct RebuildMapCacheMessage : ecs::BaseMessage {
+    RebuildMapCacheMessage() {};
+    RebuildMapCacheMessage(std::shared_ptr<Level> l, bool wizMode) : level(l), wizardMode(wizMode) {}
+
+    std::shared_ptr<Level> level;
+    bool wizardMode;
 };

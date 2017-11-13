@@ -18,7 +18,9 @@
 
 #define rootLayer 0
 #define mapLayer  1
-#define testLayer 2
+#define msgLayer  2
+#define infoLayer 3
+#define testLayer 999
 
 struct KeyPressed {
     KeyPressed() {}

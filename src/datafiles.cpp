@@ -53,6 +53,10 @@ void readTerrainConfigFile(Config& c)
         c.terrain[id].blocksLight = it.get("blocks_light", false).asBool();
         c.terrain[id].blocksMovement = it.get("blocks_movement", false).asBool();
         c.terrain[id].visible = it.get("visible", false).asBool();
+        c.terrain[id].openable = it.get("openable", false).asBool();
+        c.terrain[id].isOpen = it.get("is_open", false).asBool();
+        c.terrain[id].openID = it.get("open_id", "ERROR").asString();
+        c.terrain[id].closedID = it.get("closed_id", "ERROR").asString();
     }
 }
 

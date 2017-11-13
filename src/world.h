@@ -9,9 +9,10 @@
 #include "components.h"
 
 std::vector<ecs::Entity*> findAllEntitiesAtPosition(u32 x, u32 y);
-bool positionBlocksMovement(u32 x, u32 y);
-ecs::Entity* makeWall(u32 x, u32 y);
-ecs::Entity* makeFloor(u32 x, u32 y);
+bool cellBlocksMovement(u32 x, u32 y);
+ecs::Entity* cellIsOpenable(u32 x, u32 y);
+bool cellOpen(ecs::Entity *e);
+
 
 struct MapCacheCell {
     unsigned char glyph;

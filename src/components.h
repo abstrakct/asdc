@@ -94,8 +94,17 @@ struct Vision {
     std::array<std::array<bool, 256>, 256> fovMap = {};                     // For now, make it a big array so we don't to translate coordinates and crap. Also, zero out the array. TODO: move FOV to mapcache?
 };
 
+/*
+ * Openable component. For things that can be opened and closed
+ */
 
+struct Openable {
+    Openable() {}
+    Openable(bool b, std::string o, std::string c) : isOpen(b), openID(o), closedID(c) {}
 
+    bool isOpen;
+    std::string openID, closedID;
+};
 
 
 

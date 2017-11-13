@@ -11,10 +11,10 @@
 
 class LevelFactory {
     public:
-        LevelFactory(std::shared_ptr<Level> l, Config& conf);
-        void setLevel(std::shared_ptr<Level> l) { level = l; }
+        LevelFactory(std::shared_ptr<Level> l);
+        void setLevel(std::shared_ptr<Level> l) { level = l; } // TODO: clean/reset stuff
 
-        void createCell(u32 x, u32 y, std::string def);
+        //void createCell(u32 x, u32 y, std::string def);
         void defineCell(u32 x, u32 y, std::string def);
 
         // "Painting" on our "canvas"
@@ -27,16 +27,20 @@ class LevelFactory {
 
         void build();
 
-        // TODO: child class for various generators!?
+        // TODO: child classes for various generators!?
         void generateClassicDungeonAttemptOne();
         void generateDrunkenWalk();
+
+        // Utility functions
+        bool canPlacePrefab(int sx, int sy, std::string id);
+        bool canPlacePrefab(int sx, int sy, std::string id, std::string accept);
 
     private:
         void canvasToEntities();
         std::shared_ptr<Level> level;
-        Config& c;
         std::unordered_map<std::string, int> defToCanvas;
         std::unordered_map<int, std::string> canvasToDef;
         int canvas[256][256] = {};  // TODO: use std::array instead?
 };
 
+void createCell(std::shared_ptr<Level> level, u32 x, u32 y, std::string def);

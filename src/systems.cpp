@@ -18,6 +18,40 @@ extern std::shared_ptr<Console> mapConsole;
 extern sf::RenderWindow window;
 extern sf::RenderTexture tex;
 
+void MapCacheSystem::buildMapCache(RebuildMapCacheMessage &msg)
+{
+    std::shared_ptr<Level> level = msg.level;
+    bool wizMode = msg.wizardMode;
+
+    //TODO: this probably needs to be improved if we add invisible entities
+    MapCacheCell tmp;
+    for (auto it : level->cells) {
+        if(!it->deleted) {
+            Position *pos = it->component<Position>();
+            Renderable *r = it->component<Renderable>();
+            MapCell *cell = it->component<MapCell>();
+            Physicality *p= it->component<Physicality>();
+            if(pos && r && cell && p) {
+                if(p->visible) {
+                    tmp.glyph = r->glyph;
+                    tmp.fgColor = r->fgColor;
+                    tmp.bgColor = r->bgColor;
+                    tmp.fadedColor = r->fadedColor;
+
+                    if(wizMode) {
+                        tmp.blocksLight = false;
+                        tmp.seen = true;
+                    } else {
+                        tmp.blocksLight = p->blocksLight;
+                        tmp.seen = level->cache[pos->x][pos->y].seen;      // keep the value of 'seen'
+                    }
+
+                    level->cache[pos->x][pos->y] = tmp;
+                }
+            }
+        }
+    }
+}
 
 void CameraSystem::update(const double durationMS)
 {
@@ -28,16 +62,6 @@ void CameraSystem::update(const double durationMS)
         Vision *v = ecs::entity(playerID)->component<Vision>();
 
         mapConsole->clear();
-
-        //int startx = (pos->x - v->fovRadius);
-        //int endx   = (pos->x + v->fovRadius);
-        //int starty = (pos->y - v->fovRadius);
-        //int endy   = (pos->y + v->fovRadius);
-
-        //if (startx <= 0) startx = 0;
-        //if (starty <= 0) starty = 0;
-        //if (endx >= world->currentLevel->width)  endx = world->currentLevel->lastx;
-        //if (endy >= world->currentLevel->height) endy = world->currentLevel->lasty;
 
         int startx = 0;
         int starty = 0;

@@ -6,6 +6,13 @@
 #include "components.h"
 #include "utils.h"
 #include "ecs.h"
+#include "datafiles.h"
+#include "levelfactory.h"
+#include "game.h"
+#include "messages.h"
+
+extern GameState gs;
+extern std::shared_ptr<World> world;
 
 // TODO: move these definitions to a data file
 #define WALL_GLYPH  '#'
@@ -70,8 +77,6 @@ Level::~Level()
 }
 
 
-// TODO/IDEA: when generating a level, "fill" it with nothing, then populate the void with dungeon features, then fill in remaining cells with floor...?
-
 void World::addLevel(std::string levelName, u32 w, u32 h)
 {
     level[levelName] = std::make_shared<Level>(w, h);
@@ -81,8 +86,9 @@ void World::addLevel(std::string levelName, u32 w, u32 h)
  * Look at all entities in a certain position,
  * return true if any blocks movement.
  * TODO: move to cache!???!??!
+ * TODO: return pointer to Entity if successful, nullptr if not?
  */
-bool positionBlocksMovement(u32 x, u32 y)
+bool cellBlocksMovement(u32 x, u32 y)
 {
     for (auto it : ecs::findAllEntitiesWithComponent<Position>()) {
         Position *c = it->component<Position>();
@@ -95,3 +101,41 @@ bool positionBlocksMovement(u32 x, u32 y)
     return false;
 }
 
+// TODO: make a more generic "isInteractable/interact" function?
+ecs::Entity* cellIsOpenable(u32 x, u32 y)
+{
+    for (auto it : ecs::findAllEntitiesWithComponent<Position>()) {
+        Position *c = it->component<Position>();
+        if(c && c->x == x && c->y == y) {
+            Openable *o = it->component<Openable>();
+            if(o)
+                return it;
+        }
+    }
+    return nullptr;
+}
+
+// TODO: only works on current level for now!
+// Change if e.g. monsters/npcs on other levels can walk around and open doors!
+// Alternatively, when Position component has level info, just use that.
+// 
+// Returns true if successful
+bool cellOpen(ecs::Entity *e)
+{
+    if(e == nullptr)
+        return false;
+
+    Position *p = e->component<Position>();
+    Openable *o = e->component<Openable>();
+
+    if(p && o) {
+        if(!o->isOpen) {
+            createCell(world->currentLevel, p->x, p->y, o->openID);
+            ecs::deleteEntity(e->id);
+            emit(RebuildMapCacheMessage(world->currentLevel, gs.isWizardMode));
+            return true;
+        }
+    }
+
+    return false;
+}

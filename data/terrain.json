@@ -3,9 +3,9 @@
         {
             "id": "floor",
             "glyph": ".",
-            "fg_color": "444444FF",
+            "fg_color": "D9C89FFF",
             "bg_color": "00000000",
-            "faded_color": "44444444",
+            "faded_color": "D9C89F44",
             "blocks_light": false,
             "blocks_movement": false,
             "visible": true
@@ -13,12 +13,38 @@
         {
             "id": "wall",
             "glyph": "#",
-            "fg_color": "AAAAAAFF",
+            "fg_color": "734F2BFF",
             "bg_color": "00000000",
-            "faded_color": "AAAAAA44",
+            "faded_color": "734F2B44",
             "blocks_light": true,
             "blocks_movement": true,
             "visible": true
+        },
+        {
+            "id": "closed_door",
+            "glyph": "+",
+            "fg_color": "633D1BFF",
+            "bg_color": "00000000",
+            "faded_color": "633D1B44",
+            "blocks_light": true,
+            "blocks_movement": true,
+            "visible": true,
+            "openable": true,
+            "is_open": false,
+            "open_id": "open_door"
+        },
+        {
+            "id": "open_door",
+            "glyph": "'",
+            "fg_color": "633D1BFF",
+            "bg_color": "00000000",
+            "faded_color": "633D1B44",
+            "blocks_light": false,
+            "blocks_movement": false,
+            "visible": true,
+            "openable": true,
+            "is_open": true,
+            "closed_id": "closed_door"
         }
     ]
 }

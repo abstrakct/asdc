@@ -21,28 +21,15 @@
 #include "levelfactory.h"
 #include "utils.h"
 
+extern Config c;
+
 class CouldntPaintIt: public std::exception
 {
   virtual const char* what() const throw()
   {
     return "LevelFactory: Couldn't paint that thing there!";
   }
-} nope;  // TODO: more descriptive name!
-
-
-LevelFactory::LevelFactory(std::shared_ptr<Level> l, Config& conf) : level(l), c(conf)
-{
-    int canvasID = 1;
-
-    defToCanvas["unpainted"] = 0;
-    canvasToDef[0] = "unpainted";
-    // Assign an ID to each terrain definition, used for painting our canvas.
-    for (auto it : c.terrain) {
-        defToCanvas[it.first] = canvasID;
-        canvasToDef[canvasID] = it.first;
-        canvasID++;
-    }
-}
+} couldNotPlaceDungeonFeature;
 
 /*
  * Create a cell at x,y defined by def.
@@ -50,14 +37,34 @@ LevelFactory::LevelFactory(std::shared_ptr<Level> l, Config& conf) : level(l), c
  * Therefore you should only use this function when building an empty level
  * or when, for other reasons, you know there's no other cell at that spot.
  */
-void LevelFactory::createCell(u32 x, u32 y, std::string def)
+void createCell(std::shared_ptr<Level> level, u32 x, u32 y, std::string def)
 {
     TerrainDefinition d = c.terrain[def];
-    level->cells.push_back(ecs::createEntity()
+    ecs::Entity *newCell = ecs::createEntity()
         ->assign(Position(x, y))
         ->assign(Renderable(d.glyph, d.fgColor, d.bgColor, d.fadedColor))
         ->assign(Physicality(d.blocksLight, d.blocksMovement, d.visible))
-        ->assign(MapCell()));
+        ->assign(MapCell());
+
+    if(d.openable)
+        newCell->assign(Openable(d.isOpen, d.openID, d.closedID));
+
+    level->cells.push_back(newCell);
+}
+
+
+LevelFactory::LevelFactory(std::shared_ptr<Level> l) : level(l)
+{
+    int canvasID = 1;
+
+    defToCanvas["unpainted"] = 9999;
+    canvasToDef[9999] = "unpainted";
+    // Assign an ID to each terrain definition, used for painting our canvas.
+    for (auto it : c.terrain) {
+        defToCanvas[it.first] = canvasID;
+        canvasToDef[canvasID] = it.first;
+        canvasID++;
+    }
 }
 
 // Define the cell at x,y
@@ -134,35 +141,67 @@ void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string de
     paintLine(x1, y2, x2, y2, def);
 }
 
+// TODO: Rotation of prefabs! 
 void LevelFactory::paintPrefab(int sx, int sy, std::string id)
 {
     int x = 0;
     int y = 0;
     Prefab p = c.prefab[id];
-
-    for (auto it : p.map) {
-        for (auto str : it) {
-            if (canvas[x][y] == defToCanvas["wall"])
-                throw nope;
-            paintCell(sx + x, sy + y, p.legend[str]);
-            x++;
+    // if placement wasn't rejected, go ahead and paint it
+    if(canPlacePrefab(sx, sy, id)) {
+        for (auto it : p.map) {
+            for (auto str : it) {
+                paintCell(sx + x, sy + y, p.legend[str]);
+                x++;
+            }
+            y++;
+            x = 0;
         }
-        y++;
-        x = 0;
     }
+}
+
+bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id)
+{
+    bool accepted = true;
+
+    for (int cx  = 0; cx < c.prefab[id].width; cx++) {
+        for (int cy  = 0; cy < c.prefab[id].height; cy++) {
+            // try every cell before painting, and reject/accept placement
+            // TODO: Alternatively, add a flag to say when to reject or not
+            if (canvas[cx+sx][cy+sy] != defToCanvas["unpainted"])
+                accepted = false;
+        }
+    }
+
+    return accepted;
+}
+
+// TODO: support variable number of arguments, to add several acceptable terrain types? or a vector?
+bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id, std::string accept)
+{
+    bool accepted = true;
+
+    for (int cx  = 0; cx < c.prefab[id].width; cx++) {
+        for (int cy  = 0; cy < c.prefab[id].height; cy++) {
+            // try every cell before painting, and reject/accept placement
+            // TODO: Alternatively, add a flag to say when to reject or not
+            if (canvas[cx+sx][cy+sy] != defToCanvas[accept])
+                accepted = false;
+        }
+    }
+
+    return accepted;
 }
 
 void LevelFactory::build()
 {
-    try {
-        paintPrefab(1, 15, "normal_room");
-    }
-    catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
+    fill("unpainted");
+    for (int i = 0; i < 20; i++) {
+        paintPrefab(ri(1, 40), ri(1, 20), "test_room");
     }
 
-    fillUnpainted("wall");
-    generateDrunkenWalk();
+    fillUnpainted("floor");
+    //generateDrunkenWalk();
 
     paintRectangle(0, 0, level->lastx, level->lasty, "wall");
 
@@ -212,7 +251,7 @@ void LevelFactory::canvasToEntities()
 {
     for (int x = 0; x < level->width; x++) {
         for (int y = 0; y < level->height; y++) {
-            createCell(x, y, canvasToDef[canvas[x][y]]);
+            createCell(level, x, y, canvasToDef[canvas[x][y]]);
         }
     }
 }

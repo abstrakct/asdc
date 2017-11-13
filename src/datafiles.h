@@ -30,6 +30,9 @@ struct TerrainDefinition {
     bool blocksLight;
     bool blocksMovement;
     bool visible;
+    bool openable;          // can be opened/closed
+    bool isOpen;
+    std::string openID, closedID;
 };
 
 struct Prefab {
