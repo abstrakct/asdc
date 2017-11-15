@@ -45,6 +45,19 @@
             "openable": true,
             "is_open": true,
             "closed_id": "closed_door"
+        },
+        {
+            "id": "openable_wall",
+            "glyph": "#",
+            "fg_color": "734F2BFF",
+            "bg_color": "00000000",
+            "faded_color": "734F2B44",
+            "blocks_light": true,
+            "blocks_movement": true,
+            "visible": true,
+            "openable": true,
+            "is_open": false,
+            "open_id": "floor"
         }
     ]
 }

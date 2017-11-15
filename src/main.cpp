@@ -38,6 +38,7 @@ std::mt19937 rng;
 
 GameState gs;
 Config c;
+u64 playerID;
 
 //////////// VARIOUS NOTES AND IDEAS AND THOUGHTS
 // NEXT TODO:
@@ -154,6 +155,20 @@ void initGUI()
     // TODO: Define handles for gui components
 }
 
+void initPlayer()
+{ 
+    // TODO: don't hardcode these values
+
+    ecs::Entity *e = ecs::createEntity()
+        ->assign(Being())
+        ->assign(Controllable())
+        ->assign(Position(world->currentLevelGetOpenPosition()))
+        ->assign(Renderable('@', sf::Color(0x36425EFF), sf::Color(0x00000000), sf::Color::Black))
+        ->assign(Vision(7));
+
+    playerID = e->id;
+}
+
 int main(int argc, char *argv[])
 {
     c = readConfigFiles();
@@ -166,12 +181,7 @@ int main(int argc, char *argv[])
     seed = time(0);
     rng.seed(seed);
 
-    // create player and the world (only one level for now)
-    ecs::createEntity(playerID)
-        ->assign(Position(25, 15))
-        ->assign(Renderable('@', sf::Color(0x36425EFF), sf::Color(0x00000000), sf::Color::Black))
-        ->assign(Vision(5)); // TODO: not hard-code this and other things...
-    
+    // create world (only one level for now)
     world = std::make_unique<World>();
     world->addLevel("Dungeon Level 1", 50, 30);
     world->setCurrentLevel("Dungeon Level 1");
@@ -179,6 +189,7 @@ int main(int argc, char *argv[])
     LevelFactory lf(world->currentLevel);
     lf.build();
 
+    initPlayer();
 
     // add and configure systems
     ecs::addSystem<MapCacheSystem>();
@@ -199,3 +210,5 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+// vim: foldmethod=syntax

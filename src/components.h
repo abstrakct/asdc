@@ -7,6 +7,26 @@
 #include <SFML/Graphics.hpp>
 #include "ecs.h"
 
+#define MAXFOV 10
+
+/*
+ * Being component. Makes this entity a (living?) being of some sort.
+ */
+struct Being {
+};
+
+/*
+ * Controllable component. Makes this entity controllable. For now only used for the player.
+ */
+struct Controllable {
+};
+
+/*
+ * Item component. Makes this entity an item that can be interacted with.
+ */
+struct Item {
+};
+
 /*
  * Health component.
  * Holds data related to an entity's health.
@@ -27,6 +47,7 @@ struct Health {
 struct Position {
     Position() {}
     Position(u32 _x, u32 _y) : x(_x), y(_y) {}
+    Position(std::pair<int, int> p) : x(p.first), y(p.second) {}
 
     u32 x, y;
     //std::string level;
@@ -47,15 +68,14 @@ struct Renderable {
 };
 
 /*
- * Mapcell component. Indicates that this entity is a cell on the map, and
- * what type of cell it is.
+ * Mapcell component. Indicates that this entity is a cell on the map.
+ * (and maybe what type of cell it is.)
  */
 enum MapCellType {
     cellUnused = 0,
     cellFloor,
     cellWall
 };
-
 struct MapCell {
 //    MapCell() {}
 //    MapCell(MapCellType t) : type(t) {}
@@ -83,7 +103,6 @@ struct Physicality {
  * Vision component. Handles FOV data, and in the future other data related
  * to vision, e.g. the ability to see invisible things, blindness, etc.
  */
-#define MAXFOV 10
 struct Vision {
     Vision() {}
     Vision(int fov) : fovRadius(fov) {}
@@ -97,7 +116,6 @@ struct Vision {
 /*
  * Openable component. For things that can be opened and closed
  */
-
 struct Openable {
     Openable() {}
     Openable(bool b, std::string o, std::string c) : isOpen(b), openID(o), closedID(c) {}
@@ -128,3 +146,4 @@ struct Openable {
 
 
 
+// vim: foldmethod=syntax

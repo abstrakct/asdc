@@ -82,6 +82,26 @@ void World::addLevel(std::string levelName, u32 w, u32 h)
     level[levelName] = std::make_shared<Level>(w, h);
 }
 
+// Return coordinates to a position on currentLevel that can be occupied by a being.
+// Assumes currentLevel points to an initialized level.
+// TODO: use cache?!
+std::pair<int, int> World::currentLevelGetOpenPosition()
+{
+    bool done = false;
+    int x = 0;
+    int y = 0;
+
+    while(!done) {
+        x = ri(1, currentLevel->lastx);
+        y = ri(1, currentLevel->lasty);
+        // TODO: check for other beings!
+        if(!cellBlocksMovement(x, y))
+            done = true;
+    }
+
+    return std::make_pair(x, y);
+}
+
 /*
  * Look at all entities in a certain position,
  * return true if any blocks movement.
@@ -119,7 +139,8 @@ ecs::Entity* cellIsOpenable(u32 x, u32 y)
 // Change if e.g. monsters/npcs on other levels can walk around and open doors!
 // Alternatively, when Position component has level info, just use that.
 // 
-// Returns true if successful
+// Open an Openable entity.
+// Returns true if successful.
 bool cellOpen(ecs::Entity *e)
 {
     if(e == nullptr)

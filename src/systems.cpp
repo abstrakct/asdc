@@ -14,6 +14,7 @@
 extern std::unique_ptr<GUI> gui;
 extern std::unique_ptr<World> world;
 extern std::shared_ptr<Console> mapConsole;
+extern u64 playerID;
 
 extern sf::RenderWindow window;
 extern sf::RenderTexture tex;

@@ -18,6 +18,5 @@ typedef uint64_t u64;
 typedef int32_t  i32;
 typedef int64_t  i64;
 
-const u64 playerID = 1;     // Entity with ID 1 is always the player.
-// how many tiles in every direction the player can see. TODO: improve this - add as component?
-#define FOV 100
+extern u64 playerID;
+

@@ -47,6 +47,7 @@ class World {
             if(level.find(name) != level.end())
                 currentLevel = level[name];
         }
+        std::pair<int, int> currentLevelGetOpenPosition();                // return coordinates to an open/walkable position on current level
 
         std::unordered_map<std::string, std::shared_ptr<Level>> level;
         std::shared_ptr<Level> currentLevel;
