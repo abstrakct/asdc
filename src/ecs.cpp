@@ -18,10 +18,6 @@ std::vector<std::unique_ptr<BaseComponentStore>> componentStore;
 std::vector<std::unique_ptr<SubscriptionBase>> pubsubHolder;
 std::vector<std::unique_ptr<BaseSystem>> systemStore;
 
-u64 Entity::entityCounter{0};
-u64 BaseComponent::typeCounter = 0;
-u64 BaseMessage::typeCounter = 0;
-
 Entity* entity(const u64 id) noexcept {
     Entity *result = nullptr;
 	auto finder = entityStore.find(id);

@@ -42,7 +42,7 @@ const u64 invalidEntity = 0;
  * Base Component class. Components need to be derived from this.
  */
 struct BaseComponent {
-    static u64 typeCounter;
+    inline static u64 typeCounter = 0;
     u64 entityID;
     bool deleted = false;
 };
@@ -103,7 +103,7 @@ extern std::vector<std::unique_ptr<BaseComponentStore>> componentStore;
  * Entity class definition
  */
 class Entity {
-    static u64 entityCounter;
+    inline static u64 entityCounter = 0;
 public:
     Entity() {
         id = ++entityCounter;
@@ -242,7 +242,7 @@ inline std::vector<Entity *> findAllEntitiesWithComponent()
  */
 
 struct BaseMessage {
-    static u64 typeCounter;
+    inline static u64 typeCounter = 0;
 };
 
 template <class C> struct Message : public BaseMessage {

@@ -64,7 +64,8 @@ u64 playerID;
  */
 //////////// END VARIOUS NOTES AND IDEAS AND THOUGHTS
 
-
+// TODO 2017-11-16
+// Look for C++17 features to use! like initializers in if/switch
 
 
 // For debugging only:
