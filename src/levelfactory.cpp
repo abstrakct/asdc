@@ -141,6 +141,17 @@ void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string de
     paintLine(x1, y2, x2, y2, def);
 }
 
+void LevelFactory::paintRectangleFilledFramed(int x1, int y1, int x2, int y2, std::string frame, std::string fill)
+{
+    for (int y = y1; y <= y2; y++)
+        paintLine(x1, y, x2, y, fill);
+
+    paintLine(x1, y1, x2, y1, frame);
+    paintLine(x1, y1, x1, y2, frame);
+    paintLine(x2, y1, x2, y2, frame);
+    paintLine(x1, y2, x2, y2, frame);
+}
+
 // TODO: Rotation of prefabs! 
 void LevelFactory::paintPrefab(int sx, int sy, std::string id)
 {
@@ -195,6 +206,12 @@ bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id, std::string ac
 
 void LevelFactory::build()
 {
+    generateClassicDungeonAttemptOne();
+}
+
+// Generate a village. Very simple semi-working test code for now.
+void LevelFactory::generateVillage()
+{
     fill("unpainted");
     for (int i = 0; i < 20; i++) {
         paintPrefab(ri(1, 40), ri(1, 20), "test_room");
@@ -211,7 +228,16 @@ void LevelFactory::build()
 // Generate the classic dungeon with rooms and corridors.
 void LevelFactory::generateClassicDungeonAttemptOne()
 {
+    fill("wall");
+    //int x1, y1, x2, y2;
+    //int minx, maxx, miny, maxy;
 
+    // proof of concept
+    paintRectangleFilledFramed(5, 5, 10, 10,   "wall", "floor");
+    paintRectangleFilledFramed(15, 15, 20, 20, "wall", "floor");
+    paintLine(7, 7, 17, 17, "floor");
+
+    canvasToEntities();
 }
 
 /*
