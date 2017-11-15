@@ -12,6 +12,8 @@
  *
  */
 
+// TODO: USE templates for drawing?! "drawable" -> rectangle, etc.  ?
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <exception>
@@ -128,8 +130,8 @@ void LevelFactory::paintLine(int x0, int y0, int x1, int y1, std::string def)
     PointVector points;
 
     points = getLineCoordinatesBresenham(x0, y0, x1, y1);
-    for (auto it : points) {
-        paintCell(it.first, it.second, def);
+    for (auto&& [px, py] : points) {                         // C++17 baby!
+        paintCell(px, py, def);
     }
 }
 
