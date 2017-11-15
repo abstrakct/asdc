@@ -176,11 +176,11 @@ Entity* createEntity(u64 newID);
 inline void deleteEntity(const u64 id)
 {
     auto e = entity(id);
-    if(!e) return;
+    if (!e) return;
     e->deleted = true; // todo: implement garbage collection?!
 
-    for(auto &store : componentStore) {
-        if(store)
+    for (auto &store : componentStore) {
+        if (store)
             store->eraseByEntityID(id);
     }
 }
@@ -192,10 +192,9 @@ inline void deleteEntity(Entity &e) noexcept
 
 inline void unsetComponentMask(const u64 id, const u64 familyID, bool deleteIfEmpty)
 {
-    auto finder = entityStore.find(id);
-    if(finder != entityStore.end()) {
+    if (auto finder = entityStore.find(id); finder != entityStore.end()) {
         finder->second.componentMask.reset(familyID);
-        if(deleteIfEmpty && finder->second.componentMask.none())
+        if (deleteIfEmpty && finder->second.componentMask.none())
             finder->second.deleted = true;
     }
 }
@@ -207,8 +206,8 @@ inline void deleteComponent(const u64 entityID, bool deleteEntityIfEmpty=false) 
     Entity e = *entity(entityID);
     C emptyComponent;
     Component<C> temp(emptyComponent);
-    if(!e.componentMask.test(temp.familyID)) return;
-    for(Component<C> &component : static_cast<ComponentStore<Component<C>> *>(componentStore[temp.familyID].get())->components) {
+    if (!e.componentMask.test(temp.familyID)) return;
+    for (Component<C> &component : static_cast<ComponentStore<Component<C>> *>(componentStore[temp.familyID].get())->components) {
         if (component.entityID == entityID) {
             component.deleted = true;
             unsetComponentMask(entityID, temp.familyID, deleteEntityIfEmpty);
@@ -293,8 +292,7 @@ template <class C> struct SubscriptionHolder : SubscriptionBase {
                     std::get<1>(func)(message);
                 } else {
                     // It is destined for the system's mailbox queue.
-                    auto finder = std::get<2>(func)->mailboxes.find(handle.familyID);
-                    if (finder != std::get<2>(func)->mailboxes.end()) {
+                    if (auto finder = std::get<2>(func)->mailboxes.find(handle.familyID); finder != std::get<2>(func)->mailboxes.end()) {
                         static_cast<Mailbox<C> *>(finder->second.get())->messages.push(message);
                     }
                 }
@@ -340,8 +338,7 @@ struct BaseSystem {
 
     template<class MSG> std::queue<MSG> *mbox() {
         Message<MSG> handle(MSG{});
-        auto finder = mailboxes.find(handle.familyID);
-        if (finder != mailboxes.end()) {
+        if (auto finder = mailboxes.find(handle.familyID); finder != mailboxes.end()) {
             return &static_cast<Mailbox<MSG> *>(finder->second.get())->messages;
         } else {
             return nullptr;
@@ -365,8 +362,8 @@ template <class MSG> inline void emit(MSG message)
             if (std::get<0>(func) && std::get<1>(func)) {
                 std::get<1>(func)(message);
             } else {
-                auto finder = std::get<2>(func)->mailboxes.find(handle.familyID);
-                if (finder != std::get<2>(func)->mailboxes.end()) {
+                
+                if (auto finder = std::get<2>(func)->mailboxes.find(handle.familyID); finder != std::get<2>(func)->mailboxes.end()) {
                     static_cast<Mailbox<MSG> *>(finder->second.get())->messages.push(message);
                 }
             }

@@ -208,7 +208,7 @@ bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id, std::string ac
 
 void LevelFactory::build()
 {
-    generateClassicDungeonAttemptOne();
+    generateVillage();
 }
 
 // Generate a village. Very simple semi-working test code for now.
