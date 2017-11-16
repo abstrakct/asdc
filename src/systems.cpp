@@ -64,25 +64,40 @@ void CameraSystem::update(const double durationMS)
 
         mapConsole->clear();
 
-        int startx = 0;
-        int starty = 0;
-        int endx = world->currentLevel->lastx;
-        int endy = world->currentLevel->lasty;
+        int px = mapConsole->widthInChars / 2;   // draw player in the middle of the screen.
+        int py = mapConsole->heightInChars / 2;
 
-        for (i32 x = startx; x <= (i32)endx; x++) {
-            for (i32 y = starty; y <= (i32)endy; y++) {
-                if (v->fovMap[x][y]) {
-                    mapConsole->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fgColor);
-                    world->currentLevel->cache[x][y].seen = true;
-                } else if (world->currentLevel->cache[x][y].seen) {
+        int vx1 = ((i32)(pos->x - px) < 0) ? 0 : (pos->x - px);                    // viewport x1 (coordinate on map)
+        int vy1 = ((i32)(pos->y - py) < 0) ? 0 : (pos->y - py);                    // viewport y1 (coordinate on map)
+        //int vx2 = ((i32)(pos->x + px) > (i32)mapConsole->widthInChars)  ? mapConsole->widthInChars  : (pos->x + px);
+        //int vy2 = ((i32)(pos->y + py) > (i32)mapConsole->heightInChars) ? mapConsole->heightInChars : (pos->y + py);
+
+        //int startx = pos->x - v->fovRadius;
+        //int starty = pos->y - v->fovRadius;
+        //int endx   = pos->x + v->fovRadius;
+        //int endy   = pos->x + v->fovRadius;
+        
+        int sx1 = 0;                             // screen x1 (coordinate on screen)
+        int sy1 = 0;
+        int sx2 = mapConsole->widthInChars;
+        int sy2 = mapConsole->heightInChars;
+
+        // mx, my = map x,y
+        for (int y = sy1, my = vy1; y <= sy2; y++, my++) {
+            for (int x = sx1, mx = vx1; x <= sx2; x++, mx++) {
+                if (v->fovMap[mx][my]) {
+                    mapConsole->put(x, y, world->currentLevel->cache[mx][my].glyph, world->currentLevel->cache[mx][my].fgColor);
+                    world->currentLevel->cache[mx][my].seen = true;
+                } else if (world->currentLevel->cache[mx][my].seen) {
                     // TODO/IDEA: have the game choose the faded color? Just take the fgcolor and lower the alpha value.
-                    mapConsole->put(x, y, world->currentLevel->cache[x][y].glyph, world->currentLevel->cache[x][y].fadedColor);
+                    mapConsole->put(x, y, world->currentLevel->cache[mx][my].glyph, world->currentLevel->cache[mx][my].fadedColor);
                 }
+                if ((u32)mx == pos->x && (u32)my == pos->y)
+                    mapConsole->put(x, y, r->glyph, r->fgColor);
             }
         }
 
         // put player
-        mapConsole->put(pos->x, pos->y, r->glyph, r->fgColor);
 
         // draw everything to screen.
         window.clear(sf::Color::Black);
@@ -100,7 +115,7 @@ void CameraSystem::update(const double durationMS)
 
 // TODO: improve CameraSystem!
 // TODO: Move to a different file!
-void VisibilitySystem::configure()
+void FOVSystem::configure()
 {
         systemName = "Visibility System";
         subscribe<PlayerMovedMessage>([](PlayerMovedMessage &msg) {
@@ -109,7 +124,7 @@ void VisibilitySystem::configure()
                 });
 }
 
-void VisibilitySystem::update(const double durationMS)
+void FOVSystem::update(const double durationMS)
 {
     if(firstRun) {
         ecs::emit(PlayerMovedMessage{});
@@ -126,3 +141,4 @@ void VisibilitySystem::update(const double durationMS)
 
 
 
+// vim: fdm=syntax

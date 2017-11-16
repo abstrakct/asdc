@@ -135,12 +135,36 @@ void LevelFactory::paintLine(int x0, int y0, int x1, int y1, std::string def)
     }
 }
 
-void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string def)
+void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string frame, std::string fill, bool doFrame, bool doFill)
 {
-    paintLine(x1, y1, x2, y1, def);
-    paintLine(x1, y1, x1, y2, def);
-    paintLine(x2, y1, x2, y2, def);
-    paintLine(x1, y2, x2, y2, def);
+    if (doFill) {
+        for (int y = y1; y <= y2; y++)
+            paintLine(x1, y, x2, y, fill);
+    }
+
+    if (doFrame) {
+        paintLine(x1, y1, x2, y1, frame);
+        paintLine(x1, y1, x1, y2, frame);
+        paintLine(x2, y1, x2, y2, frame);
+        paintLine(x1, y2, x2, y2, frame);
+    }
+}
+
+//void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string def)
+//{
+    //paintLine(x1, y1, x2, y1, def);
+    //paintLine(x1, y1, x1, y2, def);
+    //paintLine(x2, y1, x2, y2, def);
+    //paintLine(x1, y2, x2, y2, def);
+//}
+
+void LevelFactory::paintRectangleFilled(int x1, int y1, int x2, int y2, std::string def)
+{
+
+    //paintLine(x1, y1, x2, y1, def);
+    //paintLine(x1, y1, x1, y2, def);
+    //paintLine(x2, y1, x2, y2, def);
+    //paintLine(x1, y2, x2, y2, def);
 }
 
 void LevelFactory::paintRectangleFilledFramed(int x1, int y1, int x2, int y2, std::string frame, std::string fill)
@@ -209,13 +233,14 @@ bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id, std::string ac
 void LevelFactory::build()
 {
     generateVillage();
+    canvasToEntities();
 }
 
 // Generate a village. Very simple semi-working test code for now.
 void LevelFactory::generateVillage()
 {
     fill("unpainted");
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 10; i++) {
         paintPrefab(ri(1, 40), ri(1, 20), "test_room");
     }
 
@@ -223,8 +248,6 @@ void LevelFactory::generateVillage()
     //generateDrunkenWalk();
 
     paintRectangle(0, 0, level->lastx, level->lasty, "wall");
-
-    canvasToEntities();
 }
 
 // Generate the classic dungeon with rooms and corridors.
@@ -235,11 +258,9 @@ void LevelFactory::generateClassicDungeonAttemptOne()
     //int minx, maxx, miny, maxy;
 
     // proof of concept
-    paintRectangleFilledFramed(5, 5, 10, 10,   "wall", "floor");
-    paintRectangleFilledFramed(15, 15, 20, 20, "wall", "floor");
+    paintRectangle(5, 5, 10, 10,   "wall", "floor", false, true);
+    paintRectangle(15, 15, 20, 20, "wall", "floor", false, true);
     paintLine(7, 7, 17, 17, "floor");
-
-    canvasToEntities();
 }
 
 /*
@@ -255,6 +276,7 @@ void LevelFactory::generateDrunkenWalk()
     q = level->lastx*3;
     r = level->lasty*2;
 
+    fill("wall");
     for(i = 2; i < q; ++i) {
         x = level->lastx / 2;
         y = level->lasty / 2;
@@ -268,8 +290,9 @@ void LevelFactory::generateDrunkenWalk()
             }
 
             if(x < level->lastx && y < level->lasty) {
-                if(canvas[x][y] == defToCanvas["wall"])
+                if(canvas[x][y] == defToCanvas["wall"]) {
                     paintCell(x, y, "floor");
+                }
             }
         }
     }
@@ -283,3 +306,5 @@ void LevelFactory::canvasToEntities()
         }
     }
 }
+
+// vim: fdm=syntax

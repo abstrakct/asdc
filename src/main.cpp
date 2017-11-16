@@ -196,9 +196,9 @@ int main(int argc, char *argv[])
     // add and configure systems
     ecs::addSystem<MapCacheSystem>();           // for (re)building the map cache
     ecs::addSystem<PlayerSystem>();             // for handling player movement. expand in the future.
-    ecs::addSystem<VisibilitySystem>();         // for keeping the FOV map up to date
+    ecs::addSystem<FOVSystem>();                // for keeping the FOV map up to date
     ecs::addSystem<CameraSystem>();             // for drawing the map on screen
-    //ecs::addSystem<ActorMovementSystem>();      // for general movement of actors/beings. not really used yet.
+    //ecs::addSystem<ActorMovementSystem>();    // for general movement of actors/beings. not really used yet.
     ecs::configureAllSystems();
 
     emit(RebuildMapCacheMessage(world->currentLevel, false));

@@ -20,7 +20,9 @@ class LevelFactory {
         // "Painting" on our "canvas"
         void paintCell(u32 x, u32 y, std::string def) { canvas[x][y] = defToCanvas[def]; }
         void paintLine(int x0, int y0, int x1, int y1, std::string def);
-        void paintRectangle(int x1, int y1, int x2, int y2, std::string def);
+        //void paintRectangle(int x1, int y1, int x2, int y2, std::string def);
+        void paintRectangle(int x1, int y1, int x2, int y2, std::string frame, std::string fill = "", bool doFrame = true, bool doFill = false);
+        void paintRectangleFilled(int x1, int y1, int x2, int y2, std::string def);
         void paintRectangleFilledFramed(int x1, int y1, int x2, int y2, std::string frame, std::string fill);
         void fill(std::string def);
         void fillUnpainted(std::string def);
