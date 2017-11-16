@@ -105,20 +105,24 @@ std::pair<int, int> World::currentLevelGetOpenPosition()
 /*
  * Look at all entities in a certain position,
  * return true if any blocks movement.
- * TODO: move to cache!???!??!
  * TODO: return pointer to Entity if successful, nullptr if not?
  */
+//bool cellBlocksMovement(u32 x, u32 y)
+//{
+//    for (auto it : ecs::findAllEntitiesWithComponent<Position>()) {
+//        Position *c = it->component<Position>();
+//        if(c && c->x == x && c->y == y) {
+//            Physicality *p = it->component<Physicality>();
+//            if(p->blocksMovement)
+//                return true;
+//        }
+//    }
+//    return false;
+//}
 bool cellBlocksMovement(u32 x, u32 y)
 {
-    for (auto it : ecs::findAllEntitiesWithComponent<Position>()) {
-        Position *c = it->component<Position>();
-        if(c && c->x == x && c->y == y) {
-            Physicality *p = it->component<Physicality>();
-            if(p->blocksMovement)
-                return true;
-        }
-    }
-    return false;
+    // TODO: take into account any other beings in this location
+    return world->currentLevel->cache[x][y].blocksMovement;
 }
 
 // TODO: make a more generic "isInteractable/interact" function?

@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 
     // create world (only one level for now)
     world = std::make_unique<World>();
-    world->addLevel("Dungeon Level 1", 50, 30);
+    world->addLevel("Dungeon Level 1", 100, 50);
     world->setCurrentLevel("Dungeon Level 1");
 
     LevelFactory lf(world->currentLevel);

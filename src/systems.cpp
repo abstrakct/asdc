@@ -38,9 +38,11 @@ void MapCacheSystem::buildMapCache(RebuildMapCacheMessage &msg)
                     tmp.fgColor = r->fgColor;
                     tmp.bgColor = r->bgColor;
                     tmp.fadedColor = r->fadedColor;
+                    tmp.blocksMovement = p->blocksMovement;
 
                     if(wizMode) {
                         tmp.blocksLight = false;
+                        tmp.blocksMovement = false;
                         tmp.seen = true;
                     } else {
                         tmp.blocksLight = p->blocksLight;

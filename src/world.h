@@ -20,6 +20,7 @@ struct MapCacheCell {
     sf::Color bgColor;
     sf::Color fadedColor;
     bool blocksLight; 
+    bool blocksMovement;
     bool seen = false;
 };
 
