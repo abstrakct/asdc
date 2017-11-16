@@ -35,7 +35,7 @@ extern std::shared_ptr<World> world;
 //   ...
 // TODO: read about exceptions and throwing and catching!
 
-std::vector<ecs::Entity*> findAllEntitiesAtPosition(u32 x, u32 y)
+std::vector<ecs::Entity*> findAllEntitiesAtPosition(int x, int y)
 {
     std::vector<ecs::Entity*> ret;
 
@@ -54,7 +54,7 @@ std::vector<ecs::Entity*> findAllEntitiesAtPosition(u32 x, u32 y)
     // TODO: check if garbage collection works.
     // also TODO: findallentititiesatposition is very slow! see above and ecs.h/cpp
     
-//void Level::changeIntoWall(u32 x, u32 y)
+//void Level::changeIntoWall(int x, int y)
 //{
     // TODO: only problem now is that this is very slow!
     // UPDATE: it's faster now that we set done=true - but still pretty slow (about 2 seconds for a 10x10 room.
@@ -64,7 +64,7 @@ std::vector<ecs::Entity*> findAllEntitiesAtPosition(u32 x, u32 y)
     // Probably not good in-game because it requires rebuilding map cache
 //}
 
-Level::Level(u32 w, u32 h)
+Level::Level(int w, int h)
 {
     width = w;
     height = h;
@@ -77,7 +77,7 @@ Level::~Level()
 }
 
 
-void World::addLevel(std::string levelName, u32 w, u32 h)
+void World::addLevel(std::string levelName, int w, int h)
 {
     level[levelName] = std::make_shared<Level>(w, h);
 }
@@ -107,7 +107,7 @@ std::pair<int, int> World::currentLevelGetOpenPosition()
  * return true if any blocks movement.
  * TODO: return pointer to Entity if successful, nullptr if not?
  */
-//bool cellBlocksMovement(u32 x, u32 y)
+//bool cellBlocksMovement(int x, int y)
 //{
 //    for (auto it : ecs::findAllEntitiesWithComponent<Position>()) {
 //        Position *c = it->component<Position>();
@@ -130,7 +130,7 @@ bool cellBlocksMovement(int x, int y)
 // TODO: make a more generic "isInteractable/interact" function?
 // TODO: use cache?
 // Checks to see if a cell (on current level!) is openable, returns pointer to entity if it is.
-ecs::Entity* cellIsOpenable(u32 x, u32 y)
+ecs::Entity* cellIsOpenable(int x, int y)
 {
     ecs::Entity *ret = nullptr;
     ecs::each<Openable, Position>([&] (ecs::Entity &e, Openable &o, Position &p) {
@@ -160,7 +160,7 @@ bool cellOpen(ecs::Entity *e)
         if(!o->isOpen) {
             createCell(world->currentLevel, p->x, p->y, o->openID);
             ecs::deleteEntity(e->id);
-            emit(RebuildMapCacheMessage(world->currentLevel, gs.isWizardMode));
+            ecs::emit(RebuildMapCacheMessage(world->currentLevel, p->x, p->y, p->x, p->y, gs.isWizardMode));
             return true;
         }
     }

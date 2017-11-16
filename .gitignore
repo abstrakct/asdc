@@ -2,3 +2,6 @@ asdc
 bin/*
 build/*
 notes.txt
+plan.txt
+res/fonts/Zilk_16x16.png
+res/fonts/lazy_font.png

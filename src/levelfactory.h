@@ -14,11 +14,11 @@ class LevelFactory {
         LevelFactory(std::shared_ptr<Level> l);
         void setLevel(std::shared_ptr<Level> l) { level = l; } // TODO: clean/reset stuff
 
-        //void createCell(u32 x, u32 y, std::string def);
-        void defineCell(u32 x, u32 y, std::string def);
+        //void createCell(int x, int y, std::string def);
+        void defineCell(int x, int y, std::string def);
 
         // "Painting" on our "canvas"
-        void paintCell(u32 x, u32 y, std::string def) { canvas[x][y] = defToCanvas[def]; }
+        void paintCell(int x, int y, std::string def) { canvas[x][y] = defToCanvas[def]; }
         void paintLine(int x0, int y0, int x1, int y1, std::string def);
         //void paintRectangle(int x1, int y1, int x2, int y2, std::string def);
         void paintRectangle(int x1, int y1, int x2, int y2, std::string frame, std::string fill = "", bool doFrame = true, bool doFill = false);
@@ -47,4 +47,4 @@ class LevelFactory {
         int canvas[256][256] = {};  // TODO: use std::array instead?
 };
 
-void createCell(std::shared_ptr<Level> level, u32 x, u32 y, std::string def);
+void createCell(std::shared_ptr<Level> level, int x, int y, std::string def);

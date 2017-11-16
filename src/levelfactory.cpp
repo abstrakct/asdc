@@ -39,7 +39,7 @@ class CouldntPaintIt: public std::exception
  * Therefore you should only use this function when building an empty level
  * or when, for other reasons, you know there's no other cell at that spot.
  */
-void createCell(std::shared_ptr<Level> level, u32 x, u32 y, std::string def)
+void createCell(std::shared_ptr<Level> level, int x, int y, std::string def)
 {
     TerrainDefinition d = c.terrain[def];
     ecs::Entity *newCell = ecs::createEntity()
@@ -73,7 +73,7 @@ LevelFactory::LevelFactory(std::shared_ptr<Level> l) : level(l)
 // Can become very slow if there are many entitites.
 // Will create a new entity if there is no mapcell at x,y
 // If there is a mapcell at x,y already we delete it and create a new one.
-void LevelFactory::defineCell(u32 x, u32 y, std::string def)
+void LevelFactory::defineCell(int x, int y, std::string def)
 {
     // TODO: is Position and Mapcell enough, or do we also need Renderable and Physicality? Seems to work fine for now...
     // TODO: can become very slow when we have many entities!
@@ -236,7 +236,7 @@ void LevelFactory::build()
     canvasToEntities();
 }
 
-// Generate a village. Very simple semi-working test code for now.
+// Generate a village. Very simple test code for now.
 void LevelFactory::generateVillage()
 {
     fill("unpainted");
@@ -245,7 +245,6 @@ void LevelFactory::generateVillage()
     }
 
     fillUnpainted("floor");
-    //generateDrunkenWalk();
 
     paintRectangle(0, 0, level->lastx, level->lasty, "wall");
 }
@@ -269,7 +268,7 @@ void LevelFactory::generateClassicDungeonAttemptOne()
  */
 void LevelFactory::generateDrunkenWalk()
 {
-    u32 i,j,x,y,q,r,num;
+    int i,j,x,y,q,r,num;
 
     //q = ri(70, level->lastx);
     //r = ri(50, level->lasty);

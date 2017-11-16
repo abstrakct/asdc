@@ -8,9 +8,9 @@
 #include "ecs.h"
 #include "components.h"
 
-std::vector<ecs::Entity*> findAllEntitiesAtPosition(u32 x, u32 y);
+std::vector<ecs::Entity*> findAllEntitiesAtPosition(int x, int y);
 bool cellBlocksMovement(int x, int y);
-ecs::Entity* cellIsOpenable(u32 x, u32 y);
+ecs::Entity* cellIsOpenable(int x, int y);
 bool cellOpen(ecs::Entity *e);
 
 
@@ -29,11 +29,11 @@ class Level {
         void initCache();
     public:
         Level() {};
-        Level(u32 w, u32 h);
+        Level(int w, int h);
         ~Level();
 
         int width, height;
-        u32 lastx, lasty;
+        int lastx, lasty;
         std::vector<ecs::Entity *> cells;
         std::array<std::array<MapCacheCell, 256>, 256> cache; // TODO: remove hard coded values!
 };
@@ -43,7 +43,7 @@ class World {
     public:
         World() {};
 
-        void addLevel(std::string levelName, u32 w, u32 h);
+        void addLevel(std::string levelName, int w, int h);
         void setCurrentLevel(std::string name) {
             if(level.find(name) != level.end())
                 currentLevel = level[name];

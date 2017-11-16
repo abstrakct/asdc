@@ -16,15 +16,19 @@ extern std::shared_ptr<Console> mapConsole;
 struct MapCacheSystem : public ecs::BaseSystem {
     virtual void configure() override {
         systemName = "Map Cache System";
-        subscribe<RebuildMapCacheMessage>([this](RebuildMapCacheMessage &msg) {
+        subscribe<BuildMapCacheMessage>([this](BuildMapCacheMessage &msg) {
                     buildMapCache(msg);
+                });
+        subscribe<RebuildMapCacheMessage>([this](RebuildMapCacheMessage &msg) {
+                    rebuildMapCache(msg);
                 });
     }
 
     virtual void update(const double durationMS) override {
     }
 
-    void buildMapCache(RebuildMapCacheMessage &msg);
+    void buildMapCache(BuildMapCacheMessage &msg);
+    void rebuildMapCache(RebuildMapCacheMessage &msg);
 };
 
 struct ActorMovementSystem : public ecs::BaseSystem {

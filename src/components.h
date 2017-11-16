@@ -34,10 +34,10 @@ struct Item {
  */
 struct Health {
     Health() {}
-    Health(u32 h, u32 m) : hitPoints(h), maxHitPoints(m) {}
+    Health(int h, int m) : hitPoints(h), maxHitPoints(m) {}
 
-    u32 hitPoints = 50;
-    u32 maxHitPoints = 100;
+    int hitPoints = 50;
+    int maxHitPoints = 100;
 };
 
 /*
@@ -46,10 +46,10 @@ struct Health {
  */
 struct Position {
     Position() {}
-    Position(u32 _x, u32 _y) : x(_x), y(_y) {}
+    Position(int _x, int _y) : x(_x), y(_y) {}
     Position(std::pair<int, int> p) : x(p.first), y(p.second) {}
 
-    u32 x, y;
+    int x, y;
     //std::string level;
 };
 

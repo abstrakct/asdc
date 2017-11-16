@@ -228,8 +228,8 @@ inline std::vector<Entity *> findAllEntitiesWithComponent()
     u64 family = handle.familyID;
     std::vector<Entity*> result;
 
-    for(auto &it : entityStore) {
-        if(it.second.componentMask[family]) {
+    for (auto &it : entityStore) {
+        if (it.second.componentMask[family]) {
             result.push_back(&it.second);
         }
     }

@@ -73,9 +73,9 @@ void wizardMode()
 {
     ecs::entity(playerID)->component<Vision>()->fovRadius = 50;
     layer(rootLayer)->addStaticText(1, 62, 22, "Wizard Mode", 0x00ff00ff);
-    emit(MapRerenderMessage{});
-    emit(RebuildMapCacheMessage(world->currentLevel, true));
-    emit(PlayerMovedMessage{});
+    ecs::emit(MapRerenderMessage{});
+    ecs::emit(BuildMapCacheMessage(world->currentLevel, true));
+    ecs::emit(PlayerMovedMessage{});
 }
 
 // Tick is called every frame. The parameter specifies how many ms have elapsed
@@ -108,7 +108,7 @@ void run(std::function<void(double)> on_tick)
                 ecs::emit(KeyPressed{event});
             if(event.type == sf::Event::MouseMoved) {
                 setMousePosition(event.mouseMove.x, event.mouseMove.y);
-                emit(MapRerenderMessage{});
+                ecs::emit(MapRerenderMessage{});
             }
         }
 
@@ -200,10 +200,10 @@ int main(int argc, char *argv[])
     //ecs::addSystem<ActorMovementSystem>();    // for general movement of actors/beings. not really used yet.
     ecs::configureAllSystems();
 
-    emit(RebuildMapCacheMessage(world->currentLevel, false));
+    ecs::emit(BuildMapCacheMessage(world->currentLevel, false));
 
-    gs.isRunning = true;
     // RUN!
+    gs.isRunning = true;
     run(ecs::tick);
 
     // Destroy everything and exit
@@ -212,4 +212,4 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-// vim: foldmethod=syntax
+// vim: fdm=syntax
