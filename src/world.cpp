@@ -119,24 +119,27 @@ std::pair<int, int> World::currentLevelGetOpenPosition()
 //    }
 //    return false;
 //}
-bool cellBlocksMovement(u32 x, u32 y)
+bool cellBlocksMovement(int x, int y)
 {
     // TODO: take into account any other beings in this location
+    if (x < 0) return true;
+    if (y < 0) return true;
     return world->currentLevel->cache[x][y].blocksMovement;
 }
 
 // TODO: make a more generic "isInteractable/interact" function?
+// TODO: use cache?
+// Checks to see if a cell (on current level!) is openable, returns pointer to entity if it is.
 ecs::Entity* cellIsOpenable(u32 x, u32 y)
 {
-    for (auto it : ecs::findAllEntitiesWithComponent<Position>()) {
-        Position *c = it->component<Position>();
-        if(c && c->x == x && c->y == y) {
-            Openable *o = it->component<Openable>();
-            if(o)
-                return it;
-        }
-    }
-    return nullptr;
+    ecs::Entity *ret = nullptr;
+    ecs::each<Openable, Position>([&] (ecs::Entity &e, Openable &o, Position &p) {
+            if (p.x == x && p.y == y) {
+                ret = &e;
+            }
+        });
+
+    return ret;
 }
 
 // TODO: only works on current level for now!

@@ -73,7 +73,7 @@ void wizardMode()
 {
     ecs::entity(playerID)->component<Vision>()->fovRadius = 50;
     layer(rootLayer)->addStaticText(1, 62, 22, "Wizard Mode", 0x00ff00ff);
-    mapConsole->dirty = true;
+    emit(MapRerenderMessage{});
     emit(RebuildMapCacheMessage(world->currentLevel, true));
     emit(PlayerMovedMessage{});
 }
@@ -108,8 +108,7 @@ void run(std::function<void(double)> on_tick)
                 ecs::emit(KeyPressed{event});
             if(event.type == sf::Event::MouseMoved) {
                 setMousePosition(event.mouseMove.x, event.mouseMove.y);
-                // quick and dirty hack for now:
-                layer(mapLayer)->console->dirty = true;
+                emit(MapRerenderMessage{});
             }
         }
 
@@ -197,7 +196,7 @@ int main(int argc, char *argv[])
     ecs::addSystem<MapCacheSystem>();           // for (re)building the map cache
     ecs::addSystem<PlayerSystem>();             // for handling player movement. expand in the future.
     ecs::addSystem<FOVSystem>();                // for keeping the FOV map up to date
-    ecs::addSystem<CameraSystem>();             // for drawing the map on screen
+    ecs::addSystem<RenderSystem>();             // for drawing the map on screen
     //ecs::addSystem<ActorMovementSystem>();    // for general movement of actors/beings. not really used yet.
     ecs::configureAllSystems();
 

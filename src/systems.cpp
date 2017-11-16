@@ -56,10 +56,23 @@ void MapCacheSystem::buildMapCache(RebuildMapCacheMessage &msg)
     }
 }
 
-void CameraSystem::update(const double durationMS)
+void RenderSystem::configure()
 {
-    //u32 start = SDL_GetTicks();
-    if(mapConsole->dirty) {
+    systemName = "Render System";
+    subscribe_mbox<MapRerenderMessage>();
+}
+
+
+
+void RenderSystem::update(const double durationMS)
+{
+    std::queue<MapRerenderMessage> *mapChanged = mbox<MapRerenderMessage>();
+    while (!mapChanged->empty()) {
+        dirty = true;
+        mapChanged->pop();
+    }
+
+    if(dirty) {
         Position *pos = ecs::entity(playerID)->component<Position>();
         Renderable *r = ecs::entity(playerID)->component<Renderable>();
         Vision *v = ecs::entity(playerID)->component<Vision>();
@@ -106,16 +119,14 @@ void CameraSystem::update(const double durationMS)
         // TODO: separate GUI and game loop! right now, gui only updates when player moves/presses a key
         gui->render(window);
         
-        mapConsole->dirty = false;
+        dirty = false;
 
         // Question: is it quicker to draw pixels myself instead of sprites/textures? Probably not?
     }
-    //u32 end = SDL_GetTicks();
-    //std::cout << "CameraSystem::update took " << (end - start) << " ms to complete." << std::endl;
 }
 
 
-// TODO: improve CameraSystem!
+// TODO: improve RenderSystem!
 // TODO: Move to a different file!
 void FOVSystem::configure()
 {

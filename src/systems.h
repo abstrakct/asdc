@@ -52,10 +52,10 @@ struct PlayerSystem : public ecs::BaseSystem {
                 if (!cellBlocksMovement(newx, newy)) {
                     msg.actor->component<Position>()->x = newx;
                     msg.actor->component<Position>()->y = newy;
-                    mapConsole->dirty = true;
+                    emit(MapRerenderMessage{});
                     emit(PlayerMovedMessage{});
                 } else if (cellOpen(cellIsOpenable(newx, newy))) {                    // opens entity in cell if entity is openable!
-                    mapConsole->dirty = true;
+                    emit(MapRerenderMessage{});
                     emit(PlayerMovedMessage{});
                     return;
                 }
@@ -83,12 +83,12 @@ struct PlayerSystem : public ecs::BaseSystem {
     }
 };
 
-struct CameraSystem : public ecs::BaseSystem {
-    virtual void configure() override {
-        systemName = "Camera System";
-    }
-
-    virtual void update(const double durationMS) override;
+struct RenderSystem : public ecs::BaseSystem {
+    public:
+        virtual void configure() override;
+        virtual void update(const double durationMS) override;
+    private:
+        bool dirty = true;
 };
 
 struct FOVSystem : public ecs::BaseSystem {

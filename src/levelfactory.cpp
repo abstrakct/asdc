@@ -240,8 +240,8 @@ void LevelFactory::build()
 void LevelFactory::generateVillage()
 {
     fill("unpainted");
-    for (int i = 0; i < 10; i++) {
-        paintPrefab(ri(1, 40), ri(1, 20), "test_room");
+    for (int i = 0; i < 20; i++) {
+        paintPrefab(ri(1, level->width - 15), ri(1, level->height - 15), "test_room");
     }
 
     fillUnpainted("floor");

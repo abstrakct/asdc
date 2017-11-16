@@ -9,7 +9,7 @@
 #include "components.h"
 
 std::vector<ecs::Entity*> findAllEntitiesAtPosition(u32 x, u32 y);
-bool cellBlocksMovement(u32 x, u32 y);
+bool cellBlocksMovement(int x, int y);
 ecs::Entity* cellIsOpenable(u32 x, u32 y);
 bool cellOpen(ecs::Entity *e);
 

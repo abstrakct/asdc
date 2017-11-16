@@ -25,3 +25,6 @@ struct RebuildMapCacheMessage : ecs::BaseMessage {
     std::shared_ptr<Level> level;
     bool wizardMode;
 };
+
+struct MapRerenderMessage : ecs::BaseMessage {
+};
