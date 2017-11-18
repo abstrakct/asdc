@@ -190,8 +190,6 @@ int main(int argc, char *argv[])
     LevelFactory lf(world->currentLevel);
     lf.build();
 
-    initPlayer();
-
     // add and configure systems
     ecs::addSystem<MapCacheSystem>();           // for (re)building the map cache
     ecs::addSystem<PlayerSystem>();             // for handling player movement. expand in the future.
@@ -201,6 +199,8 @@ int main(int argc, char *argv[])
     ecs::configureAllSystems();
 
     ecs::emit(BuildMapCacheMessage(world->currentLevel, false));
+
+    initPlayer();
 
     // RUN!
     gs.isRunning = true;

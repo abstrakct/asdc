@@ -80,6 +80,7 @@ Level::~Level()
 void World::addLevel(std::string levelName, int w, int h)
 {
     level[levelName] = std::make_shared<Level>(w, h);
+    level[levelName]->name = levelName;
 }
 
 // Return coordinates to a position on currentLevel that can be occupied by a being.

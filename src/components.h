@@ -50,7 +50,9 @@ struct Position {
     Position(std::pair<int, int> p) : x(p.first), y(p.second) {}
 
     int x, y;
-    //std::string level;
+    std::string level;
+    // TODO: string or pointer to level?
+    // Let's try a string first, and change it to a pointer if we discover that's better.
 };
 
 /*

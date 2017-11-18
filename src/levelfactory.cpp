@@ -25,6 +25,7 @@
 
 extern Config c;
 
+/*
 class CouldntPaintIt: public std::exception
 {
   virtual const char* what() const throw()
@@ -32,7 +33,7 @@ class CouldntPaintIt: public std::exception
     return "LevelFactory: Couldn't paint that thing there!";
   }
 } couldNotPlaceDungeonFeature;
-
+*/
 /*
  * Create a cell at x,y defined by def.
  * This function does NOT check if there's already a cell at that position!
@@ -150,17 +151,32 @@ void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string fr
     }
 }
 
-//void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string def)
-//{
-    //paintLine(x1, y1, x2, y1, def);
-    //paintLine(x1, y1, x1, y2, def);
-    //paintLine(x2, y1, x2, y2, def);
-    //paintLine(x1, y2, x2, y2, def);
-//}
+//TODO: change order of parameters. this is a bit illogical right now.
+void LevelFactory::paintRectangle(Room &r, std::string frame, std::string fill, bool doFrame, bool doFill)
+{
+    if (doFill) {
+        for (int y = r.y; y <= (r.y+r.h); y++)
+            paintLine(r.x, y, (r.x+r.w), y, fill);
+    }
+
+    if (doFrame) {
+        paintLine(r.x, r.y, (r.x+r.w), r.y, frame);
+        paintLine(r.x, r.y, r.x, (r.y+r.h), frame);
+        paintLine((r.x+r.w), r.y, (r.x+r.w), (r.y+r.h), frame);
+        paintLine(r.x, (r.y+r.h), (r.x+r.w), (r.y+r.h), frame);
+    }
+}
+
+/*void LevelFactory::paintRectangle(int x1, int y1, int x2, int y2, std::string def)
+{
+    paintLine(x1, y1, x2, y1, def);
+    paintLine(x1, y1, x1, y2, def);
+    paintLine(x2, y1, x2, y2, def);
+    paintLine(x1, y2, x2, y2, def);
+}*/
 
 void LevelFactory::paintRectangleFilled(int x1, int y1, int x2, int y2, std::string def)
 {
-
     //paintLine(x1, y1, x2, y1, def);
     //paintLine(x1, y1, x1, y2, def);
     //paintLine(x2, y1, x2, y2, def);
@@ -176,6 +192,43 @@ void LevelFactory::paintRectangleFilledFramed(int x1, int y1, int x2, int y2, st
     paintLine(x1, y1, x1, y2, frame);
     paintLine(x2, y1, x2, y2, frame);
     paintLine(x1, y2, x2, y2, frame);
+}
+
+bool LevelFactory::getRandomValidRoomPlacement(Room &r)
+{
+    const int maxRoomX = 12;
+    const int maxRoomY = 12;
+
+    // TODO: some settings for max room width/height? on per-level-basis? define in level-layout/-blueprint thing?
+    
+    // Let's try (up to) 100 times. If all fail, there's probably no room left......
+    for (int i = 0; i < 100; i++) {
+        r.x = ri(1, level->lastx - maxRoomX);
+        r.y = ri(1, level->lasty - maxRoomY);
+        r.w = ri(4, maxRoomX);
+        r.h = ri(4, maxRoomY);
+        if (areaIsUnused(r)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool LevelFactory::areaIsUnused(Room &r)
+{
+    bool accepted = true;
+
+    for (int cy = r.y; cy < (r.y + r.h); cy++) {
+        for (int cx = r.x; cx < (r.x + r.w); cx++) {
+            // try every cell before painting, and reject/accept placement
+            // TODO: Alternatively, add a flag to say when to reject or not
+            if (canvas[cx][cy] != defToCanvas["unpainted"])
+                accepted = false;
+        }
+    }
+
+    return accepted;
 }
 
 // TODO: Rotation of prefabs! 
@@ -218,8 +271,8 @@ bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id, std::string ac
 {
     bool accepted = true;
 
-    for (int cx  = 0; cx < c.prefab[id].width; cx++) {
-        for (int cy  = 0; cy < c.prefab[id].height; cy++) {
+    for (int cx = 0; cx < c.prefab[id].width; cx++) {
+        for (int cy = 0; cy < c.prefab[id].height; cy++) {
             // try every cell before painting, and reject/accept placement
             // TODO: Alternatively, add a flag to say when to reject or not
             if (canvas[cx+sx][cy+sy] != defToCanvas[accept])
@@ -232,7 +285,7 @@ bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id, std::string ac
 
 void LevelFactory::build()
 {
-    generateVillage();
+    generateClassicDungeonAttemptOne();
     canvasToEntities();
 }
 
@@ -252,14 +305,26 @@ void LevelFactory::generateVillage()
 // Generate the classic dungeon with rooms and corridors.
 void LevelFactory::generateClassicDungeonAttemptOne()
 {
-    fill("wall");
-    //int x1, y1, x2, y2;
-    //int minx, maxx, miny, maxy;
+    Room room[25];
 
-    // proof of concept
-    paintRectangle(5, 5, 10, 10,   "wall", "floor", false, true);
-    paintRectangle(15, 15, 20, 20, "wall", "floor", false, true);
-    paintLine(7, 7, 17, 17, "floor");
+    fill("unpainted");
+
+    bool done = false;
+    while (!done) {
+        for (int i = 0; i < 25; ++i) {
+            getRandomValidRoomPlacement(room[i]);
+            if (ri(1, 10) == 1) {
+                // paint a prefab!
+                if (canPlacePrefab(room[i].x, room[i].y, "test_room"))      // TODO: these two can be combined to one function
+                    paintPrefab(room[i].x, room[i].y, "test_room");
+            } else {
+                paintRectangle(room[i], "wall", "floor", true, true);
+            }
+        }
+        done = true;
+    }
+
+    fillUnpainted("wall");
 }
 
 /*
@@ -299,8 +364,8 @@ void LevelFactory::generateDrunkenWalk()
 
 void LevelFactory::canvasToEntities()
 {
-    for (int x = 0; x < level->width; x++) {
-        for (int y = 0; y < level->height; y++) {
+    for (int y = 0; y < level->height; y++) {
+        for (int x = 0; x < level->width; x++) {
             createCell(level, x, y, canvasToDef[canvas[x][y]]);
         }
     }

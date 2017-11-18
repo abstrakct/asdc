@@ -9,6 +9,10 @@
 #include "world.h"
 #include "datafiles.h"
 
+struct Room {
+    int x, y, w, h;
+};
+
 class LevelFactory {
     public:
         LevelFactory(std::shared_ptr<Level> l);
@@ -22,11 +26,14 @@ class LevelFactory {
         void paintLine(int x0, int y0, int x1, int y1, std::string def);
         //void paintRectangle(int x1, int y1, int x2, int y2, std::string def);
         void paintRectangle(int x1, int y1, int x2, int y2, std::string frame, std::string fill = "", bool doFrame = true, bool doFill = false);
+        void paintRectangle(Room &r, std::string frame, std::string fill = "", bool doFrame = true, bool doFill = false);
         void paintRectangleFilled(int x1, int y1, int x2, int y2, std::string def);
         void paintRectangleFilledFramed(int x1, int y1, int x2, int y2, std::string frame, std::string fill);
         void fill(std::string def);
         void fillUnpainted(std::string def);
         void paintPrefab(int sx, int sy, std::string id);
+        
+        bool makeRandomRoom(Room &r);
 
         void build();
 
@@ -38,6 +45,7 @@ class LevelFactory {
         // Utility functions
         bool canPlacePrefab(int sx, int sy, std::string id);
         bool canPlacePrefab(int sx, int sy, std::string id, std::string accept);
+        bool areaIsUnused(Room r);
 
     private:
         void canvasToEntities();

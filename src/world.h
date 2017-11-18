@@ -26,12 +26,12 @@ struct MapCacheCell {
 
 class Level {
     private:
-        void initCache();
     public:
         Level() {};
         Level(int w, int h);
         ~Level();
 
+        std::string name;
         int width, height;
         int lastx, lasty;
         std::vector<ecs::Entity *> cells;
