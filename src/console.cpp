@@ -17,12 +17,13 @@
 //extern sf::RenderWindow window;
 extern sf::RenderTexture tex;
 
-Console::Console(int xO, int yO, u32 w, u32 h)
+Console::Console(int xO, int yO, u32 w, u32 h, sf::BlendMode b)
 {
     widthInPixels = w;
     heightInPixels = h;
     xOffset = xO;
     yOffset = yO;
+    blend = b;
     tex.create(w, h);
 }
 
@@ -132,7 +133,7 @@ void Console::render(sf::RenderWindow &window)
     tex.display();
     sf::Sprite compositor(tex.getTexture());
     compositor.move(xOffset, yOffset);
-    window.draw(compositor, sf::BlendAdd);
+    window.draw(compositor, blend);
 }
 
 void Console::render(sf::RenderWindow &window, u32 startx, u32 starty, u32 endx, u32 endy)
@@ -199,6 +200,46 @@ void Console::print(int x, int y, std::string text, sf::Color fgColor)
         put(x, y, c, fgColor);
         x++;
     }
+}
+
+namespace boxchar {
+const int topleft    = 0xda;
+const int topright   = 0xbf;
+const int botleft    = 0xc0;
+const int botright   = 0xd9;
+const int vertical   = 0xc4;
+const int horizontal = 0xb3;
+}
+void Console::printBox(int x, int y, int w, int h)
+{
+    put(x, y, boxchar::topleft, 0xffffffff);
+    put(x+w, y, boxchar::topright, 0xffffffff);
+    put(x, y+h, boxchar::botleft, 0xffffffff);
+    put(x+w, y+h, boxchar::botright, 0xffffffff);
+
+    for (int i = x+1; i < (x+w); i++) {
+        put(i, y, boxchar::vertical, 0xffffffff);
+        put(i, y+h, boxchar::vertical, 0xffffffff);
+    }
+    for (int i = y+1; i < (y+h); i++) {
+        put(x, i, boxchar::horizontal, 0xffffffff);
+        put(x+w, i, boxchar::horizontal, 0xffffffff);
+    }
+}
+
+void Console::textBox(std::string title, std::string text)
+{
+    fillChar(' ');
+    // TODO: support word-wrapping / multiline text
+    const int boxWidth = text.size() + 4;
+    const int boxHeight = 5;
+    const int x = (widthInChars / 2) - (boxWidth / 2);
+    const int y = (heightInChars / 2) - (boxHeight / 2);
+    const int titlex = x + (boxWidth / 2) - (title.size() / 2);
+
+    printBox(x, y, boxWidth, boxHeight);
+    print(titlex, y, title, sf::Color::White);
+    print(x+3, y+2, text, sf::Color::White);
 }
 
 Rectangle Console::cellToRectangle(u32 x, u32 y) const

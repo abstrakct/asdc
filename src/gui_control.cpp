@@ -16,7 +16,7 @@ void GuiStaticText::render(std::shared_ptr<Console> console)
 
 void GuiMessageBox::render(std::shared_ptr<Console> console)
 {
-
+    console->textBox(title, text);
 }
 
 //void GuiStaticText::handleMouseOver(GuiControl *ctrl, int termx, int termy)

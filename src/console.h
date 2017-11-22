@@ -43,12 +43,13 @@ class Console {
         sf::Sprite fontSprite[256];
         Cell cell[256][256];            // TODO: remove hard coded max values
         sf::RenderTexture tex;
+        sf::BlendMode blend;
         int xOffset, yOffset;
 
         sf::IntRect rectForGlyph(unsigned char c) const;
         void createSprites();
     public:
-        Console(int xO, int yO, u32 w, u32 h);
+        Console(int xO, int yO, u32 w, u32 h, sf::BlendMode b = sf::BlendAdd);
         //Console(u32 w, u32 h, std::string font);
         ~Console();
 
@@ -67,6 +68,8 @@ class Console {
         void print(int x, int y, std::string text);
         void print(int x, int y, std::string text, u32 fgColor);
         void print(int x, int y, std::string text, sf::Color fgColor);
+        void printBox(int x, int y, int w, int h);
+        void textBox(std::string title, std::string text);
 
         bool dirty = true;
         u32 widthInChars;

@@ -33,8 +33,6 @@ std::unique_ptr<GUI> gui;
 std::unique_ptr<World> world;
 std::shared_ptr<Console> mapConsole;         // pass as parameter instead of global variable? TODO
 
-std::unordered_map<GameStateType, ecs::BaseMessage> stateMessageType;
-
 u64 seed;
 std::mt19937 rng;
 
@@ -158,13 +156,15 @@ void initGUI()
     gui->addLayer(LHandle::map,  16, 16, mapLayerWidth, mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
     gui->addLayer(LHandle::msg,  16, mapLayerHeight+16, c.interface.screenWidth, c.interface.screenHeight - mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
     gui->addLayer(LHandle::info, mapLayerWidth+16,  16, c.interface.screenWidth - mapLayerWidth, c.interface.screenHeight, "res/fonts/terminal16x16.png", 16, 16);
+    //gui->addLayer(LHandle::dialog, 16, 16, mapLayerWidth, mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
     gui->addLayer(LHandle::dialog, 0, 0, c.interface.screenWidth, c.interface.screenHeight, "res/fonts/terminal16x16.png", 16, 16);
 
     mapConsole = layer(LHandle::map)->console;
     layer(LHandle::root)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
     layer(LHandle::msg)->addStaticText(1, 1, 1, "messages", 0x00ff00ff);
     layer(LHandle::info)->addStaticText(2, 1, 1, "info", 0x00ff00ff);
-    
+    layer(LHandle::dialog)->addMessageBox(3, "helloo", "hello world!");
+
     // TODO: Define handles for gui components
 }
 

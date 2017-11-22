@@ -25,10 +25,10 @@ Layer* GUI::getLayer(const int handle)
     return &(finder->second);
 }
 
-void GUI::addLayer(const int handle, const int X, const int Y, const int W, const int H, std::string font, const int fontW, const int fontH, int order)
+void GUI::addLayer(const int handle, const int X, const int Y, const int W, const int H, std::string font, const int fontW, const int fontH, sf::BlendMode blend, int order)
 {
     checkHandleUniqueness(handle);
-    layers.emplace(std::make_pair(handle, Layer(X, Y, W, H, font, fontW, fontH)));
+    layers.emplace(std::make_pair(handle, Layer(X, Y, W, H, font, fontW, fontH, blend)));
     if(order == -1) {
         order = renderOrder;
         ++renderOrder;

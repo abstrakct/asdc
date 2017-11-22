@@ -33,9 +33,9 @@ struct KeyPressed {
 };
 
 struct Layer {
-    Layer(const int X, const int Y, const int W, const int H, std::string fontName, const int fW, const int fH) :
+    Layer(const int X, const int Y, const int W, const int H, std::string fontName, const int fW, const int fH, sf::BlendMode b = sf::BlendAdd) :
         x(X), y(Y), w(W), h(H), font(fontName), fontWidth(fW), fontHeight(fH) {
-            console = std::make_shared<Console>(X, Y, W, H);
+            console = std::make_shared<Console>(X, Y, W, H, b);
             console->setFont(fontName, fW, fH, fW*16, fH*16);
         }
 
@@ -66,6 +66,11 @@ struct Layer {
         controls.emplace(handle, std::make_unique<GuiStaticText>(x, y, text, fgColor));
     }
 
+    inline void addMessageBox(const int handle, const std::string title, const std::string text) {
+        checkHandleUniqueness(handle);
+        controls.emplace(handle, std::make_unique<GuiMessageBox>(title, text));
+    }
+
     void render(sf::RenderWindow &window);
     int x, y, w, h;
     std::string font;
@@ -78,7 +83,7 @@ class GUI {
     public:
         GUI(const int w, const int h) : screenWidth(w), screenHeight(h) {}
         void render(sf::RenderWindow &window);
-        void addLayer(const int handle, const int X, const int Y, const int W, const int H, std::string font, const int fontW, const int fontH, int order = -1);
+        void addLayer(const int handle, const int X, const int Y, const int W, const int H, std::string font, const int fontW, const int fontH, sf::BlendMode blend = sf::BlendAdd, int order = -1);
         Layer* getLayer(const int handle);
 
     private:
