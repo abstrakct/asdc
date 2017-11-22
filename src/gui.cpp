@@ -4,7 +4,7 @@
  * The User Interface
  */
 
-#include "ui.h"
+#include "gui.h"
 #include "input.h"
 
 // TODO: Add layer blending?!
@@ -56,8 +56,8 @@ void Layer::render(sf::RenderWindow &window)
                 }
 
                 // Add mouse stuff here
-                int mx, my;
-                std::tie(mx, my) = getMousePosition();
+
+                const auto [mx, my] = getMousePosition();
 
                 if (mx >= x && mx <= (x+w) && my >= y && my <= (y+h)) {
                     const int termx = (mx - x) / fontWidth;
@@ -83,11 +83,6 @@ void Layer::render(sf::RenderWindow &window)
     }
 }
 
-void GuiStaticText::render(std::shared_ptr<Console> console)
-{
-    console->print(x, y, text, fgColor);
-}
 
-void GuiStaticText::handleMouseOver(GuiControl *ctrl, int termx, int termy)
-{
-}
+
+// vim: fdm=syntax

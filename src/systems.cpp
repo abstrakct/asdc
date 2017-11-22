@@ -8,7 +8,7 @@
 #include "ecs.h"
 #include "systems.h"
 #include "console.h"
-#include "ui.h"
+#include "gui.h"
 #include "fov.h"
 
 extern std::unique_ptr<GUI> gui;

@@ -33,6 +33,8 @@ std::unique_ptr<GUI> gui;
 std::unique_ptr<World> world;
 std::shared_ptr<Console> mapConsole;         // pass as parameter instead of global variable? TODO
 
+std::unordered_map<GameStateType, ecs::BaseMessage> stateMessageType;
+
 u64 seed;
 std::mt19937 rng;
 
@@ -77,7 +79,7 @@ u64 playerID;
 void wizardMode()
 {
     ecs::entity(playerID)->component<Vision>()->fovRadius = 50;
-    layer(rootLayer)->addStaticText(1, 62, 22, "Wizard Mode", 0x00ff00ff);
+    layer(LHandle::root)->addStaticText(1, 62, 22, "Wizard Mode", 0x00ff00ff);
     ecs::emit(MapRerenderMessage{});
     ecs::emit(BuildMapCacheMessage(world->currentLevel, true));
     ecs::emit(PlayerMovedMessage{});
@@ -133,15 +135,15 @@ void run(std::function<void(double)> on_tick)
 
 void initSFML()
 {
+    // Create the main window
     window.create(sf::VideoMode(c.interface.screenWidth, c.interface.screenHeight), "asdc");
-    sf::Vector2i windowPosition;
+    
     // TODO: remove hard coded values, set position to center of screen
+    sf::Vector2i windowPosition;
     windowPosition.x = 300;
     windowPosition.y = 200;
     window.setPosition(windowPosition);
     window.setVerticalSyncEnabled(true);
-
-    //tex.create(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void initGUI()
@@ -149,18 +151,19 @@ void initGUI()
     // Initialize console
     // TODO: make dynamic based on config/datafiles!
     gui = std::make_unique<GUI>(c.interface.screenWidth, c.interface.screenHeight);
-    gui->addLayer(rootLayer, 0, 0, c.interface.screenWidth, c.interface.screenHeight, "res/fonts/Cheepicus_16x16.png", 16, 16);
+    gui->addLayer(LHandle::root, 0, 0, c.interface.screenWidth, c.interface.screenHeight, "res/fonts/Cheepicus_16x16.png", 16, 16);
 
     int mapLayerWidth = 800;
     int mapLayerHeight = 480;
-    gui->addLayer(mapLayer,  16, 16, mapLayerWidth, mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
-    gui->addLayer(msgLayer,  16, mapLayerHeight+16, c.interface.screenWidth, c.interface.screenHeight - mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
-    gui->addLayer(infoLayer, mapLayerWidth+16,  16, c.interface.screenWidth - mapLayerWidth, c.interface.screenHeight, "res/fonts/terminal16x16.png", 16, 16);
+    gui->addLayer(LHandle::map,  16, 16, mapLayerWidth, mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
+    gui->addLayer(LHandle::msg,  16, mapLayerHeight+16, c.interface.screenWidth, c.interface.screenHeight - mapLayerHeight, "res/fonts/terminal16x16.png", 16, 16);
+    gui->addLayer(LHandle::info, mapLayerWidth+16,  16, c.interface.screenWidth - mapLayerWidth, c.interface.screenHeight, "res/fonts/terminal16x16.png", 16, 16);
+    gui->addLayer(LHandle::dialog, 0, 0, c.interface.screenWidth, c.interface.screenHeight, "res/fonts/terminal16x16.png", 16, 16);
 
-    mapConsole = layer(mapLayer)->console;
-    layer(rootLayer)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
-    layer(msgLayer)->addStaticText(1, 1, 1, "messages", 0x00ff00ff);
-    layer(infoLayer)->addStaticText(2, 1, 1, "info", 0x00ff0fff);
+    mapConsole = layer(LHandle::map)->console;
+    layer(LHandle::root)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
+    layer(LHandle::msg)->addStaticText(1, 1, 1, "messages", 0x00ff00ff);
+    layer(LHandle::info)->addStaticText(2, 1, 1, "info", 0x00ff00ff);
     
     // TODO: Define handles for gui components
 }

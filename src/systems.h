@@ -7,7 +7,7 @@
 #include "ecs.h"
 #include "messages.h"
 #include "world.h"
-#include "ui.h"
+#include "gui.h"
 #include "console.h"
 
 extern std::unique_ptr<GUI> gui;

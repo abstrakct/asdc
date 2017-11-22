@@ -1,5 +1,5 @@
 /*
- * ui.h
+ * gui.h
  *
  * The User Interface
  *
@@ -15,49 +15,21 @@
 
 #include "common.h"
 #include "console.h"
+#include "gui_control.h"
 
-#define rootLayer 0
-#define mapLayer  1
-#define msgLayer  2
-#define infoLayer 3
-#define testLayer 999
+enum LHandle : int {
+    root = 1,
+    map,
+    msg,
+    info,
+    dialog,
+    test
+};
 
 struct KeyPressed {
     KeyPressed() {}
     KeyPressed(sf::Event ev) : event(ev) {}
     sf::Event event;
-};
-
-struct GuiControl {
-    virtual void render(std::shared_ptr<Console> console) = 0;
-    virtual bool mouseInsideControl(const int tx, const int ty) { return false; };
-    
-    // Callbacks
-    std::function<void(GuiControl*)> onRenderStart;
-    std::function<void(GuiControl*, int, int)> onMouseOver;
-    std::function<void(GuiControl*, int, int)> onMouseDown;
-    std::function<void(GuiControl*, int, int)> onMouseUp;
-};
-
-struct GuiStaticText : public GuiControl {
-    // TODO: use sf::Color ?
-    // TODO: strings with color tags? to add different colors to different parts of the string.
-    GuiStaticText(const int X, const int Y, const std::string txt, u32 fC) : x(X), y(Y), text(txt), fgColor(fC) {
-        onMouseOver = [this] (GuiControl *ctrl, int tx, int ty) {
-            fgColor = 0x0000fffff;
-        };
-    };
-    virtual void render(std::shared_ptr<Console> console) override;
-    virtual bool mouseInsideControl(const int tx, const int ty) override {
-        return (tx >= x && tx <= x + (static_cast<int>(text.size())) && ty == y);
-    }
-    
-    // Callbacks for handling mouse events
-    void handleMouseOver(GuiControl *ctrl, int termx, int termy);
-
-    int x, y;
-    std::string text = "";
-    u32 fgColor;
 };
 
 struct Layer {
@@ -67,10 +39,21 @@ struct Layer {
             console->setFont(fontName, fW, fH, fW*16, fH*16);
         }
 
-    template<class T> T* control(const int handle) {
+    template<class T>
+    T* control(const int handle) {
         auto finder = controls.find(handle);
         if (finder == controls.end()) throw std::runtime_error("Unknown GUI control handle: " + std::to_string(handle));
         return static_cast<T*>(finder->second.get());
+    }
+
+    GuiControl* control(const int handle) {
+        auto finder = controls.find(handle); 
+        if (finder == controls.end()) throw std::runtime_error("Unknown GUI control handle: " + std::to_string(handle));
+        return finder->second.get();
+    }
+
+    inline void removeControl(const int handle) {
+        controls.erase(handle);
     }
 
     inline void checkHandleUniqueness(const int handle) {
@@ -111,3 +94,6 @@ class GUI {
 
 extern std::unique_ptr<GUI> gui;
 inline Layer* layer(const int &handle) { return gui->getLayer(handle); };
+
+
+// vim: fdm=syntax

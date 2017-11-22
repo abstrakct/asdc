@@ -26,12 +26,6 @@ Console::Console(int xO, int yO, u32 w, u32 h)
     tex.create(w, h);
 }
 
-//Console::Console(u32 w, u32 h, std::string font)
-//{
-//    widthInPixels = w;
-//    heightInPixels = h;
-//}
-
 Console::~Console()
 {
 }
@@ -106,7 +100,6 @@ void Console::fillColor(sf::Color color)
     }
 }
 
-
 void Console::fillChar(unsigned char c)
 {
     for (u32 y = 0; y < heightInChars; y++) {
@@ -139,7 +132,7 @@ void Console::render(sf::RenderWindow &window)
     tex.display();
     sf::Sprite compositor(tex.getTexture());
     compositor.move(xOffset, yOffset);
-    window.draw(compositor);
+    window.draw(compositor, sf::BlendAdd);
 }
 
 void Console::render(sf::RenderWindow &window, u32 startx, u32 starty, u32 endx, u32 endy)
