@@ -43,6 +43,11 @@ u64 playerID;
 //////////// VARIOUS NOTES AND IDEAS AND THOUGHTS
 // NEXT TODO:
 // Build a GUI class that can handle multiple consoles/layers of various sizes.
+// TODO mostly done!
+// TODO: UI screens/layers must be able to receive input! For handling various things, like an inventory screen.
+// or maybe we will have multiple game states, and input will be redirected based on what state we are in!
+// So, if state is "show inventory" then all input will be delivered as a "inventoryInputEvent" message!!
+// That seems like a good idea!
 
 // IDEA: shared components!?! For components that can be the same for many entities, like the Physical component of walls. 
 // But will it be unnecessarily complicated? Maybe/probably... 
@@ -51,7 +56,7 @@ u64 playerID;
 //
 // TODO: look into regex! also, string formatting.
 /*
- * BELOW COMMENT IS MORE OR LESS DEPRECATED:
+ * BELOW COMMENT IS MORE OR LESS DEPRECATED/DONE:
  * Build a cache for a level map, so that we don't need to iterate through a million entities each render loop.
  * Cache is a 2D array inside the Level class that gets allocated in the constructor.
  * Takes a little while to get done, but only needs to be done once for each level.
@@ -89,26 +94,30 @@ void run(std::function<void(double)> on_tick)
     double durationMS = 0.0;
     bool done = false;
 
-    while(window.isOpen() && !done) {
+    while (window.isOpen() && !done) {
         clock_t startTime = clock();
         sf::Event event;
 
-        while(window.pollEvent(event)) {
-            if(event.type == sf::Event::Closed)
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
                 done = true;
-            if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
-                done = true;
-            else if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F1) {
-                if(!gs.isWizardMode) {
-                    wizardMode();
-                    gs.isWizardMode = true;
+
+            // game state / input redirection is fairly hardcoded for now. TODO: rewrite in a more dynamic way!
+            if (gs.state == gsInGame) {
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+                    done = true;
+                else if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::W) {
+                    if (!gs.isWizardMode) {
+                        wizardMode();
+                        gs.isWizardMode = true;
+                    }
+                } else if (event.type == sf::Event::KeyPressed)
+                    ecs::emit(KeyPressed{event});
+
+                if (event.type == sf::Event::MouseMoved) {
+                    setMousePosition(event.mouseMove.x, event.mouseMove.y);
+                    ecs::emit(MapRerenderMessage{});
                 }
-            }
-            else if(event.type == sf::Event::KeyPressed)
-                ecs::emit(KeyPressed{event});
-            if(event.type == sf::Event::MouseMoved) {
-                setMousePosition(event.mouseMove.x, event.mouseMove.y);
-                ecs::emit(MapRerenderMessage{});
             }
         }
 
@@ -165,7 +174,7 @@ void initPlayer()
         ->assign(Controllable())
         ->assign(Position(world->currentLevelGetOpenPosition()))
         ->assign(Renderable('@', sf::Color(0x36425EFF), sf::Color(0x00000000), sf::Color::Black))
-        ->assign(Vision(7));
+        ->assign(Vision(9));
 
     playerID = e->id;
 }
@@ -204,6 +213,7 @@ int main(int argc, char *argv[])
 
     // RUN!
     gs.isRunning = true;
+    gs.state = gsInGame;
     run(ecs::tick);
 
     // Destroy everything and exit

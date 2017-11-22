@@ -32,8 +32,9 @@ class LevelFactory {
         void fill(std::string def);
         void fillUnpainted(std::string def);
         void paintPrefab(int sx, int sy, std::string id);
+        void paintDoor(Room &r, std::string def);
         
-        bool makeRandomRoom(Room &r);
+        bool getRandomValidRoomPlacement(Room &r);
 
         void build();
 
@@ -45,7 +46,7 @@ class LevelFactory {
         // Utility functions
         bool canPlacePrefab(int sx, int sy, std::string id);
         bool canPlacePrefab(int sx, int sy, std::string id, std::string accept);
-        bool areaIsUnused(Room r);
+        bool areaIsUnused(Room &r);
 
     private:
         void canvasToEntities();

@@ -194,6 +194,31 @@ void LevelFactory::paintRectangleFilledFramed(int x1, int y1, int x2, int y2, st
     paintLine(x1, y2, x2, y2, frame);
 }
 
+void LevelFactory::paintDoor(Room &r, std::string def)
+{
+    // paint a door somewhere on the walls of a room
+    
+    int x, y;
+
+    if (fiftyfifty()) {
+        // door on vertical wall
+        y = ri(r.y +1, r.y + r.h - 1);
+        if (fiftyfifty())
+            x = r.x;
+        else
+            x = r.x + r.w;
+    } else {
+        // door on horizontal wall
+        x = ri(r.x + 1, r.x + r.w - 1);
+        if (fiftyfifty())
+            y = r.y;
+        else
+            y = r.y + r.h;
+    }
+
+    canvas[x][y] = defToCanvas[def];
+}
+
 bool LevelFactory::getRandomValidRoomPlacement(Room &r)
 {
     const int maxRoomX = 12;
@@ -219,8 +244,17 @@ bool LevelFactory::areaIsUnused(Room &r)
 {
     bool accepted = true;
 
-    for (int cy = r.y; cy < (r.y + r.h); cy++) {
-        for (int cx = r.x; cx < (r.x + r.w); cx++) {
+    i32 startx = r.x - 1;
+    if (startx < 0) startx = 0;
+    i32 starty = r.y - 1;
+    if (starty < 0) starty = 0;
+    i32 endx = r.x + r.w + 1;
+    if (endx > level->lastx) endx = level->lastx;
+    i32 endy = r.y + r.h + 1;
+    if (endy > level->lasty) endy = level->lasty;
+
+    for (int cy = starty; cy <= endy; cy++) {
+        for (int cx = startx; cx <= endx; cx++) {
             // try every cell before painting, and reject/accept placement
             // TODO: Alternatively, add a flag to say when to reject or not
             if (canvas[cx][cy] != defToCanvas["unpainted"])
@@ -285,25 +319,17 @@ bool LevelFactory::canPlacePrefab(int sx, int sy, std::string id, std::string ac
 
 void LevelFactory::build()
 {
-    generateClassicDungeonAttemptOne();
+    generateVillage();
     canvasToEntities();
 }
 
-// Generate a village. Very simple test code for now.
-void LevelFactory::generateVillage()
+void LevelFactory::generateClassicDungeonAttemptOne()
 {
-    fill("unpainted");
-    for (int i = 0; i < 20; i++) {
-        paintPrefab(ri(1, level->width - 15), ri(1, level->height - 15), "test_room");
-    }
-
-    fillUnpainted("floor");
-
-    paintRectangle(0, 0, level->lastx, level->lasty, "wall");
+// Generate the classic dungeon with rooms and corridors.
 }
 
-// Generate the classic dungeon with rooms and corridors.
-void LevelFactory::generateClassicDungeonAttemptOne()
+// Generate a village. Looks quite nice with this simple algorithm.
+void LevelFactory::generateVillage()
 {
     Room room[25];
 
@@ -319,12 +345,14 @@ void LevelFactory::generateClassicDungeonAttemptOne()
                     paintPrefab(room[i].x, room[i].y, "test_room");
             } else {
                 paintRectangle(room[i], "wall", "floor", true, true);
+                paintDoor(room[i], "closed_door");
             }
         }
         done = true;
     }
 
-    fillUnpainted("wall");
+    paintRectangle(0, 0, level->lastx, level->lasty, "wall");
+    fillUnpainted("floor");
 }
 
 /*
