@@ -69,7 +69,7 @@ void MapCacheSystem::rebuildMapCache(RebuildMapCacheMessage &msg)
                 Renderable *r = it->component<Renderable>();
                 MapCell *cell = it->component<MapCell>();
                 Physicality *p= it->component<Physicality>();
-                if(pos && r && cell && p) {
+                if(r && cell && p) {
                     if(p->visible) {
                         tmp.glyph = r->glyph;
                         tmp.fgColor = r->fgColor;
