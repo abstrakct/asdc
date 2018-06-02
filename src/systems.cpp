@@ -102,8 +102,6 @@ void RenderSystem::configure()
     subscribe_mbox<MapRerenderMessage>();
 }
 
-
-
 void RenderSystem::update(const double durationMS)
 {
     std::queue<MapRerenderMessage> *mapChanged = mbox<MapRerenderMessage>();

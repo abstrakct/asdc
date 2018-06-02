@@ -18,7 +18,8 @@ std::vector<std::unique_ptr<BaseComponentStore>> componentStore;
 std::vector<std::unique_ptr<SubscriptionBase>> pubsubHolder;
 std::vector<std::unique_ptr<BaseSystem>> systemStore;
 
-Entity* entity(const u64 id) noexcept {
+Entity* entity(const u64 id) noexcept
+{
     Entity *result = nullptr;
 	auto finder = entityStore.find(id);
 
@@ -89,3 +90,5 @@ void tick(const double durationMS)
 
 
 } // namespace ecs
+
+// vim: fdm=syntax

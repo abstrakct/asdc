@@ -253,3 +253,5 @@ Rectangle Console::cellToRectangle(u32 x, u32 y) const
 
     return result;
 }
+
+// vim: fdm=syntax

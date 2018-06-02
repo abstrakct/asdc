@@ -85,7 +85,8 @@ void wizardMode()
 
 // Tick is called every frame. The parameter specifies how many ms have elapsed
 // since the last time it was called.
-void tick(double duration_ms) {
+void tick(double duration_ms)
+{
     ecs::tick(duration_ms);
 }
 
@@ -163,7 +164,7 @@ void initGUI()
     layer(LHandle::root)->addStaticText(0, 63, 21, "A S D C !", 0xff0000ff);
     layer(LHandle::msg)->addStaticText(1, 1, 1, "messages", 0x00ff00ff);
     layer(LHandle::info)->addStaticText(2, 1, 1, "info", 0x00ff00ff);
-    layer(LHandle::dialog)->addMessageBox(3, "helloo", "hello world!");
+    //layer(LHandle::dialog)->addMessageBox(3, "helloo", "hello world!");
 
     // TODO: Define handles for gui components
 }

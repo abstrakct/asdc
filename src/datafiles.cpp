@@ -12,16 +12,20 @@
 // TODO: JSON might not be the best choice for doing things like predefined dungeon/map parts - investigate!
 // (CDDA uses JSON all over the place, doesn't it?)
 
+// TODO: error checking/handling in JSON parsing
+
 void readMainConfigFile(Config& c)
 {
-    std::ifstream ifs(MAIN_CONFIG_FILE);
-    Json::Reader reader;
+    std::ifstream ifs(MAIN_CONFIG_FILE, std::ifstream::binary);
     Json::Value root;
+    std::string error;
 
-    if (!reader.parse(ifs, root)) {
-        std::cout << "Error: " << reader.getFormattedErrorMessages() << std::endl;
+    ifs >> root;
+
+    /*if (!reader->parse(ifs, root)) {
+        std::cout << "Error: " << reader->getFormattedErrorMessages() << std::endl;
         return; // TODO: return something useful when failing!
-    }
+    }*/
 
     Json::Value& interfaceOptions = root["interface_options"];
 
@@ -33,13 +37,15 @@ void readMainConfigFile(Config& c)
 void readTerrainConfigFile(Config& c)
 {
     std::ifstream ifs(TERRAIN_CONFIG_FILE);
-    Json::Reader reader;
     Json::Value root;
 
-    if (!reader.parse(ifs, root)) {
+    ifs >> root;
+
+    /*if (!reader.parse(ifs, root)) {
         std::cout << "Error: " << reader.getFormattedErrorMessages() << std::endl;
         return; // TODO: return something useful when failing!
     }
+    */
 
     Json::Value& terrainDefinitions = root["terrain_definitions"];
 
@@ -64,13 +70,14 @@ void readTerrainConfigFile(Config& c)
 void readPrefabConfigFile(Config& c)
 {
     std::ifstream ifs(PREFAB_CONFIG_FILE);
-    Json::Reader reader;
     Json::Value root;
 
-    if (!reader.parse(ifs, root)) {
-        std::cout << "Error: " << reader.getFormattedErrorMessages() << std::endl;
-        return; // TODO: return something useful when failing!
-    }
+    ifs >> root;
+
+    //if (!reader.parse(ifs, root)) {
+        //std::cout << "Error: " << reader.getFormattedErrorMessages() << std::endl;
+        //return; // TODO: return something useful when failing!
+    //}
 
     Json::Value& prefab = root["prefab"];
     
