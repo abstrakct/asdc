@@ -25,7 +25,6 @@ void MapCacheSystem::buildMapCache(BuildMapCacheMessage &msg)
     bool wizMode = msg.wizardMode;
 
     //TODO: this probably needs to be improved if we add invisible entities
-    MapCacheCell tmp;
     for (auto it : level->cells) {
         if(!it->deleted) {
             Position *pos = it->component<Position>();
@@ -33,6 +32,7 @@ void MapCacheSystem::buildMapCache(BuildMapCacheMessage &msg)
             MapCell *cell = it->component<MapCell>();
             Physicality *p= it->component<Physicality>();
             if(pos && r && cell && p) {
+                MapCacheCell &tmp = level->cache[pos->x][pos->y];
                 if(p->visible) {
                     tmp.glyph = r->glyph;
                     tmp.fgColor = r->fgColor;
@@ -48,8 +48,6 @@ void MapCacheSystem::buildMapCache(BuildMapCacheMessage &msg)
                         tmp.blocksLight = p->blocksLight;
                         tmp.seen = level->cache[pos->x][pos->y].seen;      // keep the value of 'seen'
                     }
-
-                    level->cache[pos->x][pos->y] = tmp;
                 }
             }
         }
@@ -63,11 +61,11 @@ void MapCacheSystem::rebuildMapCache(RebuildMapCacheMessage &msg)
     bool wizMode = msg.wizardMode;
 
     //TODO: this probably needs to be improved if we add invisible entities
-    MapCacheCell tmp;
     for (auto it : level->cells) {
         if(!it->deleted) {
             Position *pos = it->component<Position>();
             if (pos && (pos->x >= msg.x1) && (pos->x <= msg.x2) && (pos->y >= msg.y1) && (pos->y <= msg.y2)) {
+                MapCacheCell &tmp = level->cache[pos->x][pos->y];
                 Renderable *r = it->component<Renderable>();
                 MapCell *cell = it->component<MapCell>();
                 Physicality *p= it->component<Physicality>();
@@ -87,8 +85,6 @@ void MapCacheSystem::rebuildMapCache(RebuildMapCacheMessage &msg)
                             tmp.blocksLight = p->blocksLight;
                             tmp.seen = level->cache[pos->x][pos->y].seen;      // keep the value of 'seen'
                         }
-
-                        level->cache[pos->x][pos->y] = tmp;
                     }
                 }
             }
