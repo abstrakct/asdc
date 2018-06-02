@@ -83,7 +83,7 @@ void MapCacheSystem::rebuildMapCache(RebuildMapCacheMessage &msg)
                             tmp.seen = true;
                         } else {
                             tmp.blocksLight = p->blocksLight;
-                            tmp.seen = level->cache[pos->x][pos->y].seen;      // keep the value of 'seen'
+                            //tmp.seen = level->cache[pos->x][pos->y].seen;      // keep the value of 'seen'
                         }
                     }
                 }
