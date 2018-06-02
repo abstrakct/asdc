@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <memory>
 #include "ecs.h"
 #include "components.h"
@@ -47,6 +48,8 @@ class World {
         void setCurrentLevel(std::string name) {
             if(level.find(name) != level.end())
                 currentLevel = level[name];
+            else
+                std::cout << "ERROR: can't set current level to " << name << " - no such level found!" << std::endl;
         }
         std::pair<int, int> currentLevelGetOpenPosition();                // return coordinates to an open/walkable position on current level
 

@@ -55,6 +55,10 @@ void MapCacheSystem::buildMapCache(BuildMapCacheMessage &msg)
 }
 
 // rebuild a part of the map cache. hopefully faster than rebuilding all of it.
+// TODO / ideas:
+// - add visibility to mapcachecell? that way we won't have to go through all cells, but might be counter-productive overall / down the line
+// - use pointers to entities in 2D array?
+// - 
 void MapCacheSystem::rebuildMapCache(RebuildMapCacheMessage &msg)
 {
     std::shared_ptr<Level> level = msg.level;
