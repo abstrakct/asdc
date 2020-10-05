@@ -85,8 +85,7 @@ void wizardMode()
 
 // Tick is called every frame. The parameter specifies how many ms have elapsed
 // since the last time it was called.
-void tick(double duration_ms)
-{
+void tick(double duration_ms) {
     ecs::tick(duration_ms);
 }
 
@@ -139,8 +138,8 @@ void initSFML()
     
     // TODO: remove hard coded values, set position to center of screen
     sf::Vector2i windowPosition;
-    windowPosition.x = 300;
-    windowPosition.y = 200;
+    windowPosition.x = 1400;
+    windowPosition.y = 500;
     window.setPosition(windowPosition);
     window.setVerticalSyncEnabled(true);
 }
